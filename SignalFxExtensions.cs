@@ -85,7 +85,7 @@ namespace Metrics
             return new SignalFxReporterBuilder(reports, apiToken, interval);
         }
 
-        public static SignalFxReporterBuilder WithSignalFx(this MetricsReports reports, string apiToken, IDictionary<string,string> defaultDimensions, TimeSpan interval)
+        public static SignalFxReporterBuilder WithSignalFx(this MetricsReports reports, string apiToken, IDictionary<string, string> defaultDimensions, TimeSpan interval)
         {
             return new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, interval);
         }
@@ -107,9 +107,17 @@ namespace Metrics
                     int seconds;
                     if (int.TryParse(signalFxMetricsInterval, out seconds) && seconds > 0)
                     {
-                        var defaultDimensions = (ConfigurationManager.GetSection("SignalFx/defaultDimensions") as System.Collections.Hashtable)
-                             .Cast<System.Collections.DictionaryEntry>()
-                             .ToDictionary(n => n.Key.ToString(), n => n.Value.ToString());
+                        var defaultDimensionsHash = (ConfigurationManager.GetSection("SignalFx/DefaultDimensions") as System.Collections.Hashtable);
+                        IDictionary<string, string> defaultDimensions;
+                        if (defaultDimensionsHash != null)
+                        {
+                            defaultDimensions = defaultDimensionsHash.Cast<System.Collections.DictionaryEntry>()
+                            .ToDictionary(n => n.Key.ToString(), n => n.Value.ToString());
+                        }
+                        else
+                        {
+                            defaultDimensions = new Dictionary<string, string>();
+                        }
                         SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, TimeSpan.FromSeconds(seconds));
                         switch (signalFxSourceType)
                         {
