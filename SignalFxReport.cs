@@ -12,20 +12,30 @@ namespace Metrics.SignalFx
     class SignalFxReport : BaseReport
     {
         private static readonly char[] EQUAL_SPLIT_CHARS = new char[] { '=' };
+        private static readonly string METRIC_DIMENSION = "metric";
         private static readonly string SOURCE_DIMENSION = "source";
         private static readonly string SF_SOURCE = "sf_source";
+        private static readonly HashSet<string> IGNORE_DIMENSIONS = new HashSet<string>();
+        static SignalFxReport()
+        {
+            IGNORE_DIMENSIONS.Add(SOURCE_DIMENSION);
+            IGNORE_DIMENSIONS.Add(METRIC_DIMENSION);
+        }
+
         private static readonly Regex invalid = new Regex(@"[^a-zA-Z0-9\-_]+", RegexOptions.CultureInvariant | RegexOptions.Compiled);
         private static readonly Regex slash = new Regex(@"\s*/\s*", RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
         private readonly SignalFxReporter sender;
-        private readonly string defaultSource;
+        private readonly String defaultSource;
+        private readonly IDictionary<string, string> defaultDimensions;
         private DataPointUploadMessage.Builder uploadMessage;
 
 
-        public SignalFxReport(SignalFxReporter sender, string defaultSource)
+        public SignalFxReport(SignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions)
         {
             this.sender = sender;
             this.defaultSource = defaultSource;
+            this.defaultDimensions = defaultDimensions;
         }
 
         protected override void StartReport(string contextName, DateTime timestamp)
@@ -159,39 +169,48 @@ namespace Metrics.SignalFx
 
         protected virtual void Add(Datum value, string name, com.signalfuse.metrics.protobuf.MetricType metricType, MetricTags tags)
         {
+            IDictionary<string, string> dimensions = ParseTagsToDimensions(tags);
             DataPoint.Builder dataPoint = DataPoint.CreateBuilder();
             dataPoint.SetValue(value);
-            dataPoint.SetMetric(name);
+            string metricName = dimensions.ContainsKey(METRIC_DIMENSION) ? dimensions[METRIC_DIMENSION] : name;
+            string sourceName = dimensions.ContainsKey(SOURCE_DIMENSION) ? dimensions[SOURCE_DIMENSION] : defaultSource;
+            dataPoint.SetMetric(metricName);
             dataPoint.SetMetricType(metricType);
-            //dataPoint.SetTimestamp(Timestamp.ToUnixTime());
-            var sourceName = AddDimensions(dataPoint, tags);
-            if (sourceName == null) {
-                sourceName = defaultSource;
-            }
+            dataPoint.SetSource(sourceName);
             AddDimension(dataPoint, SF_SOURCE, sourceName);
-            uploadMessage.AddDatapoints(dataPoint);
 
+            AddDimensions(dataPoint, defaultDimensions);
+            AddDimensions(dataPoint, dimensions);
+
+            uploadMessage.AddDatapoints(dataPoint);
         }
 
-        protected virtual string AddDimensions(DataPoint.Builder dataPoint, MetricTags tags)
+        protected virtual void AddDimensions(DataPoint.Builder dataPoint, IDictionary<string, string> dimensions)
         {
 
-            string source = null;
+
+            foreach (KeyValuePair<string, string> entry in dimensions)
+            {
+                if (!IGNORE_DIMENSIONS.Contains(entry.Key))
+                {
+                    AddDimension(dataPoint, entry.Key, entry.Value);
+                }
+            }
+        }
+
+        protected virtual IDictionary<string, string> ParseTagsToDimensions(MetricTags tags)
+        {
+            IDictionary<string, string> retVal = new Dictionary<string, string>();
             foreach (var str in tags.Tags)
             {
                 var nameValue = str.Split(EQUAL_SPLIT_CHARS, 2);
                 if (nameValue.Length == 2)
                 {
-                    if (nameValue[0] == SOURCE_DIMENSION)
-                    {
-                        source = nameValue[0];
-                    }
-                    AddDimension(dataPoint, nameValue[0], nameValue[1]);
+                    retVal[nameValue[0]] = nameValue[1];
                 }
             }
-            return source;
+            return retVal;
         }
-
         protected virtual void AddDimension(DataPoint.Builder dataPoint, string key, string value)
         {
             Dimension.Builder dimension = Dimension.CreateBuilder();
