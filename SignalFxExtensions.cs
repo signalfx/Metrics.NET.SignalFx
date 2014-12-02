@@ -102,6 +102,7 @@ namespace Metrics
                 var signalFxMetricsInterval = ConfigurationManager.AppSettings["Metrics.SignalFx.Interval.Seconds"];
                 var signalFxSourceType = ConfigurationManager.AppSettings["Metrics.SignalFx.Source.Type"];
                 var signalFxSourceValue = ConfigurationManager.AppSettings["Metrics.SignalFx.Source.Value"];
+                var signalFxAWS = ConfigurationManager.AppSettings["Metrics.SignalFx.AWSIntegration"];
                 if (!string.IsNullOrEmpty(apiToken) && !string.IsNullOrEmpty(signalFxMetricsInterval) && !string.IsNullOrEmpty(signalFxSourceType))
                 {
                     int seconds;
@@ -118,7 +119,11 @@ namespace Metrics
                         {
                             defaultDimensions = new Dictionary<string, string>();
                         }
+
                         SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, TimeSpan.FromSeconds(seconds));
+                        if  (!string.IsNullOrEmpty(signalFxAWS) && signalFxAWS == "true") {
+                            builder = builder.WithAWSInstanceIdDimension();
+                        }
                         switch (signalFxSourceType)
                         {
                             case "netbios":
@@ -127,7 +132,7 @@ namespace Metrics
                                 return builder.WithDNSSource();
                             case "fqdn":
                                 return builder.WithFQDNSource();
-                            case "source":
+                            case "custom":
                                 if (!string.IsNullOrEmpty(signalFxSourceValue))
                                 {
                                     return builder.WithSource(signalFxSourceValue);
