@@ -81,6 +81,10 @@ Metric.Config.WithReporting(report =>
 ###App.Config Configuration
 It is also possible to use App.Config to configure the SignalFxReporter.
 
+To configure via App.Config use the following code to initialize your Metrics:
+```csharp
+Metric.Config.WithReporting(report => report.WithSignalFxFromAppConfig());
+```
 ####Basic Configuration
 You need to set the following keys:
  - Metrics.SignalFx.APIToken - You SignalFuse token
