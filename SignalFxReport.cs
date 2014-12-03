@@ -272,13 +272,17 @@ namespace Metrics.SignalFx
         protected override string FormatContextName(IEnumerable<string> contextStack, string contextName)
         {
             var parts = contextStack.Concat(new[] { contextName })
-                .Select(c => GraphiteName(c));
+                .Select(c => GraphiteName(c)).Skip(1);
 
             return string.Join(".", parts);
         }
 
         protected override string FormatMetricName<T>(string context, MetricValueSource<T> metric)
         {
+            if (string.IsNullOrEmpty(context))
+            {
+                return GraphiteName(metric.Name);
+            }
             return string.Concat(context, ".", GraphiteName(metric.Name));
         }
 
