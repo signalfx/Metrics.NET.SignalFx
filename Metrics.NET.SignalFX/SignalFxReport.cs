@@ -1,4 +1,5 @@
-﻿using com.signalfuse.metrics.protobuf;
+﻿using System.Text;
+using com.signalfuse.metrics.protobuf;
 using Metrics.MetricData;
 using Metrics.Reporters;
 using Metrics.Utils;
@@ -9,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace Metrics.SignalFx
 {
-    class SignalFxReport : BaseReport
+    internal class SignalFxReport : BaseReport
     {
         private static readonly char[] EQUAL_SPLIT_CHARS = new char[] { '=' };
         private static readonly string METRIC_DIMENSION = "metric";
@@ -25,29 +26,29 @@ namespace Metrics.SignalFx
         private static readonly Regex invalid = new Regex(@"[^a-zA-Z0-9\-_]+", RegexOptions.CultureInvariant | RegexOptions.Compiled);
         private static readonly Regex slash = new Regex(@"\s*/\s*", RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
-        private readonly SignalFxReporter sender;
+        private readonly ISignalFxReporter sender;
         private readonly String defaultSource;
         private readonly IDictionary<string, string> defaultDimensions;
         private DataPointUploadMessage.Builder uploadMessage;
 
 
-        public SignalFxReport(SignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions)
+        public SignalFxReport(ISignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions)
         {
             this.sender = sender;
             this.defaultSource = defaultSource;
             this.defaultDimensions = defaultDimensions;
         }
 
-        protected override void StartReport(string contextName, DateTime timestamp)
+        protected override void StartReport(string contextName)
         {
             this.uploadMessage = DataPointUploadMessage.CreateBuilder();
-            base.StartReport(contextName, timestamp);
+            base.StartReport(contextName);
         }
 
-        protected override void EndReport(string contextName, DateTime timestamp)
+        protected override void EndReport(string contextName)
         {
-            base.EndReport(contextName, timestamp);
-            this.sender.send(uploadMessage.Build());
+            base.EndReport(contextName);
+            this.sender.Send(uploadMessage.Build());
         }
 
         protected override void ReportGauge(string name, double value, Unit unit, MetricTags tags)
@@ -187,8 +188,6 @@ namespace Metrics.SignalFx
 
         protected virtual void AddDimensions(DataPoint.Builder dataPoint, IDictionary<string, string> dimensions)
         {
-
-
             foreach (KeyValuePair<string, string> entry in dimensions)
             {
                 if (!IGNORE_DIMENSIONS.Contains(entry.Key))
@@ -203,14 +202,12 @@ namespace Metrics.SignalFx
             IDictionary<string, string> retVal = new Dictionary<string, string>();
             foreach (var str in tags.Tags)
             {
-                var nameValue = str.Split(EQUAL_SPLIT_CHARS, 2);
-                if (nameValue.Length == 2)
-                {
-                    retVal[nameValue[0]] = nameValue[1];
-                }
+                var nameValue = ParseTag(str);
+                retVal[nameValue.Item1] = nameValue.Item2;
             }
             return retVal;
         }
+
         protected virtual void AddDimension(DataPoint.Builder dataPoint, string key, string value)
         {
             Dimension.Builder dimension = Dimension.CreateBuilder();
@@ -218,6 +215,7 @@ namespace Metrics.SignalFx
             dimension.SetValue(value);
             dataPoint.AddDimensions(dimension);
         }
+
         protected virtual string AsRate(Unit unit, TimeUnit rateUnit)
         {
             return string.Concat(unit.Name, "-per-", rateUnit.Unit());
@@ -269,6 +267,7 @@ namespace Metrics.SignalFx
 
             return string.Concat("-", clean);
         }
+
         protected override string FormatContextName(IEnumerable<string> contextStack, string contextName)
         {
             var parts = contextStack.Concat(new[] { contextName })
@@ -292,6 +291,64 @@ namespace Metrics.SignalFx
             return invalid.Replace(noSlash, "_").Trim('_');
         }
 
+        private Tuple<string, string> ParseTag(string tag)
+        {
+            StringBuilder operand = new StringBuilder();
 
+            string left;
+            bool escape = false;
+
+            var i = 0;
+            for (; i < tag.Length; ++i)
+            {
+                var chr = tag[i];
+                if (!escape)
+                {
+                    if (chr == '\\')
+                    {
+                        escape = true;
+                    }
+                    else
+                    {
+                        if (chr == '=')
+                        {
+                            ++i;
+                            break;
+                        }
+                        operand.Append(chr);
+                    }
+                }
+                else
+                {
+                    escape = false;
+                    operand.Append(chr);
+                }
+            }
+
+            escape = false;
+            left = operand.ToString();
+            operand.Clear();
+
+            for (; i < tag.Length; ++i)
+            {
+                var chr = tag[i];
+                if (!escape)
+                {
+                    if (chr == '\\')
+                    {
+                        escape = true;
+                    }
+                    else
+                    {
+                        operand.Append(chr);
+                    }
+                }
+                else
+                {
+                    operand.Append(chr);
+                }
+            }
+            return new Tuple<string, string>(left, operand.ToString());
+        }
     }
 }

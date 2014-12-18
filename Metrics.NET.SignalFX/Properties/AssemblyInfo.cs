@@ -31,3 +31,4 @@ using System.Runtime.InteropServices;
 //
 [assembly: AssemblyVersion("0.0.0.5")]
 [assembly: AssemblyFileVersion("0.0.0.5")]
+[assembly: InternalsVisibleTo("Metrics.NET.SignalFX.UnitTest")]
