@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metrics.NET.SignalFX", "Metrics.NET.SignalFX.csproj", "{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metrics.NET.SignalFX", "Metrics.NET.SignalFX\Metrics.NET.SignalFX.csproj", "{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metrics.NET.SignalFX.UnitTest", "Metrics.NET.SignalFX.UnitTest\Metrics.NET.SignalFX.UnitTest.csproj", "{29D75078-9E6C-48D0-9034-8084BEC6574D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29D75078-9E6C-48D0-9034-8084BEC6574D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29D75078-9E6C-48D0-9034-8084BEC6574D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29D75078-9E6C-48D0-9034-8084BEC6574D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29D75078-9E6C-48D0-9034-8084BEC6574D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

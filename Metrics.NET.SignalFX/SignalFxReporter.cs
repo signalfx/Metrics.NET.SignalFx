@@ -3,24 +3,22 @@ using Metrics.Logging;
 using System;
 using System.IO;
 using System.Net;
-using System.Net.Http;
+
 namespace Metrics.SignalFx
 {
-    public class SignalFxReporter
+    public class SignalFxReporter : ISignalFxReporter
     {
         private static readonly ILog log = LogProvider.GetCurrentClassLogger();
-        private HttpClient client;
         private string baseURI;
         private string apiToken;
 
         public SignalFxReporter(string baseURI, string apiToken)
         {
-            this.client = new HttpClient();
             this.baseURI = baseURI;
             this.apiToken = apiToken;
         }
 
-        public void send(DataPointUploadMessage msg)
+        public void Send(DataPointUploadMessage msg)
         {
             var req = WebRequest.CreateHttp(baseURI + "/v2/datapoint");
             req.Method = "POST";
