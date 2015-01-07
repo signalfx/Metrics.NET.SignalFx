@@ -11,4 +11,7 @@
     <releaseNotes>Initial Release</releaseNotes>
     <copyright>Copyright 2014</copyright>
   </metadata>
+  <files>
+    <file src="..\packages\Google.ProtocolBuffers.2.4.1.521\lib\net40\Google.ProtocolBuffers.dll" target="lib/net45/" /> 
+  </files>
 </package>
