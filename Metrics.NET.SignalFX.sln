@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
+# Visual Studio 2012
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metrics.NET.SignalFX", "Metrics.NET.SignalFX\Metrics.NET.SignalFX.csproj", "{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metrics.NET.SignalFX.UnitTest", "Metrics.NET.SignalFX.UnitTest\Metrics.NET.SignalFX.UnitTest.csproj", "{29D75078-9E6C-48D0-9034-8084BEC6574D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metrics.NET.SignalFX.UnitTest", "Metrics.NET.SignalFX.UnitTest\Metrics.NET.SignalFX.UnitTest.csproj", "{C7446CAE-8ABD-48BA-9A9A-242E00826044}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,14 @@ Global
 		{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{29D75078-9E6C-48D0-9034-8084BEC6574D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29D75078-9E6C-48D0-9034-8084BEC6574D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29D75078-9E6C-48D0-9034-8084BEC6574D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29D75078-9E6C-48D0-9034-8084BEC6574D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7446CAE-8ABD-48BA-9A9A-242E00826044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7446CAE-8ABD-48BA-9A9A-242E00826044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7446CAE-8ABD-48BA-9A9A-242E00826044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7446CAE-8ABD-48BA-9A9A-242E00826044}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18137FCB-3776-4394-B46F-3F46AFC80C9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18137FCB-3776-4394-B46F-3F46AFC80C9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18137FCB-3776-4394-B46F-3F46AFC80C9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18137FCB-3776-4394-B46F-3F46AFC80C9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -31,6 +31,8 @@ namespace Metrics.SignalFx
                 using (var rs = req.GetRequestStream())
                 {
                     msg.WriteTo(rs);
+                    // flush the message before disposing
+                    rs.Flush();
                 }
 
                 using (var resp = (HttpWebResponse)req.GetResponse())
