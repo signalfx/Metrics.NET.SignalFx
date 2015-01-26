@@ -29,14 +29,17 @@ namespace Metrics.SignalFx
         private readonly ISignalFxReporter sender;
         private readonly String defaultSource;
         private readonly IDictionary<string, string> defaultDimensions;
+        private readonly int maxDatapointsPerMessage;
         private DataPointUploadMessage.Builder uploadMessage;
+        private int datapointsAdded = 0;
 
 
-        public SignalFxReport(ISignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions)
+        public SignalFxReport(ISignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions, int maxDatapointsPerMessage)
         {
             this.sender = sender;
             this.defaultSource = defaultSource;
             this.defaultDimensions = defaultDimensions;
+            this.maxDatapointsPerMessage = maxDatapointsPerMessage;
         }
 
         protected override void StartReport(string contextName)
@@ -184,6 +187,13 @@ namespace Metrics.SignalFx
             AddDimensions(dataPoint, dimensions);
 
             uploadMessage.AddDatapoints(dataPoint);
+
+            if (datapointsAdded++ >= maxDatapointsPerMessage)
+            {
+                this.sender.Send(uploadMessage.Build());
+                datapointsAdded = 0;
+                this.uploadMessage = DataPointUploadMessage.CreateBuilder();
+            }
         }
 
         protected virtual void AddDimensions(DataPoint.Builder dataPoint, IDictionary<string, string> dimensions)

@@ -20,7 +20,7 @@ namespace Metrics.NET.SignalFX.UnitTest
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
-                });
+                }, 10000);
 
             var tags = new MetricTags("test\\=string=test\\value");
 

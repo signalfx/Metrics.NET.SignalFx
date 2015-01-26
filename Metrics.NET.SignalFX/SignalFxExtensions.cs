@@ -29,6 +29,7 @@ namespace Metrics
                 var signalFxSourceValue = ConfigurationManager.AppSettings["Metrics.SignalFx.Source.Value"];
                 var signalFxAWS = ConfigurationManager.AppSettings["Metrics.SignalFx.AWSIntegration"];
                 var signalFxBaseURI = ConfigurationManager.AppSettings["Metrics.SignalFx.BaseURI"];
+                var signalFxMaxDatapointsPerMessage = ConfigurationManager.AppSettings["Metrics.SignalFx.MaxDatapointsPerMessage"];
                 if (!string.IsNullOrEmpty(apiToken) && !string.IsNullOrEmpty(signalFxMetricsInterval) && !string.IsNullOrEmpty(signalFxSourceType))
                 {
                     int seconds;
@@ -51,6 +52,11 @@ namespace Metrics
                         if (!string.IsNullOrEmpty(signalFxBaseURI))
                         {
                             builder.WithBaseURI(signalFxBaseURI);
+                        }
+
+                        if (!string.IsNullOrEmpty(signalFxMaxDatapointsPerMessage))
+                        {
+                            builder.WithMaxDatapointsPerMessage(Convert.ToInt32(signalFxMaxDatapointsPerMessage));
                         }
 
                         if (!string.IsNullOrEmpty(signalFxAWS) && signalFxAWS == "true")
