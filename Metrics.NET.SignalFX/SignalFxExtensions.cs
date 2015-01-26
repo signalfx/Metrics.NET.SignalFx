@@ -23,9 +23,15 @@ namespace Metrics
         {
             return new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, interval);
         }
-        public static SignalFxReporterBuilder WithSignalFx(this MetricsReports reports, string apiToken, string baseURI, TimeSpan interval)
+
+        public static SignalFxReporterBuilder WithSignalFx(this MetricsReports reports, string apiToken, TimeSpan interval, string baseURI)
         {
             return new SignalFxReporterBuilder(reports, apiToken, interval, baseURI);
+        }
+
+        public static SignalFxReporterBuilder WithSignalFx(this MetricsReports reports, string apiToken, IDictionary<string, string> defaultDimensions, TimeSpan interval, string baseURI)
+        {
+            return new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, interval, baseURI);
         }
 
         public static MetricsReports WithSignalFxFromAppConfig(this MetricsReports reports)
@@ -37,6 +43,7 @@ namespace Metrics
                 var signalFxSourceType = ConfigurationManager.AppSettings["Metrics.SignalFx.Source.Type"];
                 var signalFxSourceValue = ConfigurationManager.AppSettings["Metrics.SignalFx.Source.Value"];
                 var signalFxAWS = ConfigurationManager.AppSettings["Metrics.SignalFx.AWSIntegration"];
+                var signalFxBaseURI = ConfigurationManager.AppSettings["Metrics.SignalFx.BaseURI"];
                 if (!string.IsNullOrEmpty(apiToken) && !string.IsNullOrEmpty(signalFxMetricsInterval) && !string.IsNullOrEmpty(signalFxSourceType))
                 {
                     int seconds;
@@ -54,7 +61,8 @@ namespace Metrics
                             defaultDimensions = new Dictionary<string, string>();
                         }
 
-                        SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, TimeSpan.FromSeconds(seconds));
+                        var baseURI = signalFxBaseURI ?? SignalFxReporterBuilder.DEFAULT_URI;
+                        SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, TimeSpan.FromSeconds(seconds), baseURI);
                         if  (!string.IsNullOrEmpty(signalFxAWS) && signalFxAWS == "true") {
                             builder = builder.WithAWSInstanceIdDimension();
                         }

@@ -9,7 +9,7 @@ namespace Metrics.SignalFx
 {
     public class SignalFxReporterBuilder
     {
-        private static readonly string DEFAULT_URI = "https://api.signalfuse.com";
+        public static readonly string DEFAULT_URI = "https://api.signalfuse.com";
         private static readonly string INSTANCE_ID_DIMENSION = "InstanceId";
 
         private MetricsReports reports;
