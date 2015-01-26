@@ -19,21 +19,6 @@ namespace Metrics
             return new SignalFxReporterBuilder(reports, apiToken, interval);
         }
 
-        public static SignalFxReporterBuilder WithSignalFx(this MetricsReports reports, string apiToken, IDictionary<string, string> defaultDimensions, TimeSpan interval)
-        {
-            return new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, interval);
-        }
-
-        public static SignalFxReporterBuilder WithSignalFx(this MetricsReports reports, string apiToken, TimeSpan interval, string baseURI)
-        {
-            return new SignalFxReporterBuilder(reports, apiToken, interval, baseURI);
-        }
-
-        public static SignalFxReporterBuilder WithSignalFx(this MetricsReports reports, string apiToken, IDictionary<string, string> defaultDimensions, TimeSpan interval, string baseURI)
-        {
-            return new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, interval, baseURI);
-        }
-
         public static MetricsReports WithSignalFxFromAppConfig(this MetricsReports reports)
         {
             try
@@ -62,27 +47,38 @@ namespace Metrics
                         }
 
                         var baseURI = signalFxBaseURI ?? SignalFxReporterBuilder.DEFAULT_URI;
-                        SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, apiToken, defaultDimensions, TimeSpan.FromSeconds(seconds), baseURI);
-                        if  (!string.IsNullOrEmpty(signalFxAWS) && signalFxAWS == "true") {
-                            builder = builder.WithAWSInstanceIdDimension();
+                        SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, apiToken, TimeSpan.FromSeconds(seconds));
+                        if (!string.IsNullOrEmpty(signalFxBaseURI))
+                        {
+                            builder.WithBaseURI(signalFxBaseURI);
+                        }
+
+                        if (!string.IsNullOrEmpty(signalFxAWS) && signalFxAWS == "true")
+                        {
+                            builder.WithAWSInstanceIdDimension();
                         }
                         switch (signalFxSourceType)
                         {
                             case "netbios":
-                                return builder.WithNetBiosNameSource();
+                                builder.WithNetBiosNameSource();
+                                break;
                             case "dns":
-                                return builder.WithDNSSource();
+                                builder.WithDNSSource();
+                                break;
                             case "fqdn":
-                                return builder.WithFQDNSource();
+                                builder.WithFQDNSource();
+                                break;
                             case "custom":
                                 if (!string.IsNullOrEmpty(signalFxSourceValue))
                                 {
-                                    return builder.WithSource(signalFxSourceValue);
+                                    builder.WithSource(signalFxSourceValue);
+                                    break;
                                 }
                                 throw new Exception("Metrics.SignalFx.Source.Value must be set if Metrics.SignalFx.Source.Type is \"source\".");
                             default:
                                 throw new Exception("Metrics.SignalFx.Source.Type must be one of netbios, dns, fqdn, or source(with Metrics.SignalFx.Source.Value set)");
                         }
+                        return builder.Build();
                     }
                 }
                 return reports;

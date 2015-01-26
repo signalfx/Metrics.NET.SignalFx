@@ -14,36 +14,41 @@ namespace Metrics.SignalFx
 
         private MetricsReports reports;
         private string apiToken;
-        private IDictionary<string, string> defaultDimensions;
         private TimeSpan interval;
-        private string baseURI;
+        private IDictionary<string, string> defaultDimensions = new Dictionary<string, string>();
+        private string baseURI = DEFAULT_URI;
+        private string defaultSource;
 
-        internal SignalFxReporterBuilder(MetricsReports reports, string apiToken, TimeSpan interval) : this(reports, apiToken, new Dictionary<string, string>(), interval) { }
-
-        internal SignalFxReporterBuilder(MetricsReports reports, string apiToken, IDictionary<string, string> defaultDimensions, TimeSpan interval) : this(reports, apiToken, defaultDimensions, interval, DEFAULT_URI) { }
-
-        internal SignalFxReporterBuilder(MetricsReports reports, string apiToken, TimeSpan interval, string baseURI) : this(reports, apiToken, new Dictionary<string, string>(), interval, baseURI) { }
-
-        internal SignalFxReporterBuilder(MetricsReports reports, string apiToken, IDictionary<string, string> defaultDimensions, TimeSpan interval, string baseURI)
+        internal SignalFxReporterBuilder(MetricsReports reports, string apiToken, TimeSpan interval)
         {
             this.reports = reports;
             this.apiToken = apiToken;
-            this.defaultDimensions = defaultDimensions;
             this.interval = interval;
-            this.baseURI = baseURI;
         }
 
-        public MetricsReports WithNetBiosNameSource()
+        public SignalFxReporterBuilder WithDefaultDimensions(IDictionary<string, string> defaultDimensions)
+        {
+            this.defaultDimensions = defaultDimensions;
+            return this;
+        }
+
+        public SignalFxReporterBuilder WithBaseURI(String baseURI)
+        {
+            this.baseURI = baseURI;
+            return this;
+        }
+
+        public SignalFxReporterBuilder WithNetBiosNameSource()
         {
             return WithSource(System.Environment.MachineName);
         }
 
-        public MetricsReports WithDNSSource()
+        public SignalFxReporterBuilder WithDNSSource()
         {
             return WithSource(System.Net.Dns.GetHostName());
         }
 
-        public MetricsReports WithFQDNSource()
+        public SignalFxReporterBuilder WithFQDNSource()
         {
             string domainName = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
             string hostName = System.Net.Dns.GetHostName();
@@ -67,10 +72,17 @@ namespace Metrics.SignalFx
                 return this;
             }
         }
+        public SignalFxReporterBuilder WithSource(string defaultSource)
+        {
+            this.defaultSource = defaultSource;
+            return this;
+        }
 
-        public MetricsReports WithSource(string defaultSource)
+        public MetricsReports Build()
         {
             return reports.WithReport(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), defaultSource, defaultDimensions), interval);
         }
+
+
     }
 }

@@ -43,29 +43,29 @@ If there are dimeensions that you wish to send on all the metrics that you repor
 ```csharp
 // Configure with NetBios Name as the default source
  Metric.Config.WithReporting(report => 
-      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithNetBiosNameSource());
+      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithNetBiosNameSource().Build());
 ```
 ```csharp
 // Configure with DNS Name as the default source
 Metric.Config.WithReporting(report => 
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithDNSNameSource());
+     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithDNSNameSource().Build());
 ```
 ```csharp
 // Configure with FQDN as the default source
 Metric.Config.WithReporting(report => 
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithFQDNSource());
+     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithFQDNSource().Build());
 ```
 ```csharp
 // Configure with custom source name
 Metric.Config.WithReporting(report => 
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithSource("<source name>"));
+     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithSource("<source name>").Build());
 ```
 
 ####AWS Integration
 ```csharp
 // Add AWS Integration
 Metric.Config.WithReporting(report =>
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithAWSInstanceIdDimension().WithNetBiosNameSource());
+     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
 ```
 
 ####Default Dimensions
@@ -75,7 +75,7 @@ IDictionary<string, string> defaultDims = new Dictionary<string, string>();
 defaultDims["environment"] = "prod";
 defaultDims["serverType"] = "API";
 Metric.Config.WithReporting(report =>
-     report.WithSignalFx("<your API token>", defaultDims, TimeSpan.FromSeconds(10)).WithAWSInstanceIdDimension().WithNetBiosNameSource());
+     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithDefaultDimensions(defaultDims).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
 ```
 
 ###App.Config Configuration
