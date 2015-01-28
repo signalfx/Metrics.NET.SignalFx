@@ -53,8 +53,8 @@
     <Compile Include="SignalFxReporter.cs" />
     <Compile Include="SignalFxReport.cs" />
     <Compile Include="SignalFxReporterBuilder.cs" />
-    <Compile Include="TaggedMetricContext.cs" />
-    <Compile Include="TaggedMetricRegisry.cs" />
+    <Compile Include="Extensions\TaggedMetricContext.cs" />
+    <Compile Include="Extensions\TaggedMetricRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

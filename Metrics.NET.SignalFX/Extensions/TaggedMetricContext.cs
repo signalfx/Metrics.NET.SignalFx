@@ -1,12 +1,6 @@
-﻿using Metrics.Core;
-using Metrics.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Metrics.Utils;
 
-namespace Metrics.SignalFX
+namespace Metrics.Core
 {
     public class TaggedMetricsContext : BaseMetricsContext
     {

@@ -1,13 +1,10 @@
-﻿using Metrics.Core;
-using Metrics.MetricData;
+﻿using Metrics.MetricData;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Metrics.SignalFX
+namespace Metrics.Core
 {
     public sealed class TaggedMetricsRegistry : MetricsRegistry
     {
