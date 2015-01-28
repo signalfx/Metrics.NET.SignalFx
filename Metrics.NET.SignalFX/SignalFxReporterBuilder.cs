@@ -1,9 +1,9 @@
 ﻿
+using Metrics.Reports;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using Metrics.Reports;
 
 namespace Metrics.SignalFx
 {

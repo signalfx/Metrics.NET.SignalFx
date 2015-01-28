@@ -86,43 +86,44 @@ To configure via App.Config use the following code to initialize your Metrics:
 Metric.Config.WithReporting(report => report.WithSignalFxFromAppConfig());
 ```
 ####Basic Configuration
-You need to set the following keys:
- - Metrics.SignalFx.APIToken - You SignalFuse token
- - Metrics.SignalFx.Interval.Seconds - How often the reporter should report (in seconds)
- - Metrics.SignalFx.Source.Type - How you would like to configure the default source. Your choices are:
-  - netbios
-  - dns
-  - fqdn
-  - custom - If you specify this you must also specify the "Metrics.SignalFx.Source.Value" key to specify the custom source.
-E.g
-```xml
-<appSettings>
- <add key="Metrics.SignalFx.APIToken" value="myapitoken"/>
- <add key="Metrics.SignalFx.Interval.Seconds" value="5"/>
- <add key="Metrics.SignalFx.Source.Type" value="netbios"/>
-</appSettings>
-```
-####AWS Integration
-If you wish to turn on the AWS Integration add the key 'Metrics.SignalFx.AWSIntegration' with a value of 'true'.
-
-###Default Dimensions
-First you need to setup configSections. So that the configuration system understands the XML elements.
+You need to first setup a section in the <configSections> portion at the
+top of your App.Config file. 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
- <configSections>
-  <sectionGroup name="SignalFx">
-   <section name="DefaultDimensions" type="System.Configuration.DictionarySectionHandler"/>
- </sectionGroup>
-</configSections>
+  <configSections>
+    <section name="signalFxReporter" type=" Metrics.SignalFX.Configuration.SignalFxReporterConfiguration, Metrics.NET.SignalFX"/>
+  </configSsections>
+  ....
+</configuration>
 ```
 
-To add default dimensions:
+Next you need to add a <signalFxReporter> stanza
+You must specify the following attributes:
+ - apiToken - Your SignalFuse token
+ - sourceType - How you would like to configure the default source. Your choices are:
+  - netbios
+  - dns
+  - fqdn
+  - custom - If you specify this you must also specify the "sourceValue" attribute to specify the custom source.
+
+The following attributes are optional
+ - sampleInterval - TimeSpan (defaults to 00:00:05, mininum 00:00:01) How often to report metrics to SignalFuse
+ - maxDatapointPerMessage - Integer (defaults to 10000, min 1, max 10000) The maximumum of points to report per message
+                            to SignalFuse
+ - awsIntegration - Boolean (default to false) If set to true then the AWS integration will be turned on. 
+E.g
 ```xml
-<SignalFx>
- <DefaultDimensions>
-  <add key="environment" value="prod"/>
-  <add key="serverType" value="API"/>
- </DefaultDimensions>
-</SignalFx>
+  <signalFxReporter apiToken="AAABQWDCC" sourceType="netbios" sampleInterval="00:00:05"/> 
+```
+
+###Default Dimensions
+To add default dimensions add a nested <defaultDimensions> in your <signalFxReporter> stanza:
+```xml
+  <signalFxReporter apiToken="AAABQWDCC" sourceType="netbios" sampleInterval="00:00:05"/> 
+    <defaultDimensions>
+      <defaultDimension name="environment" value="prod"/>
+      <defaultDimension name="serverType" value="API"/>
+    </defaultDimensions>
+  </signalFxReporter>
 ```

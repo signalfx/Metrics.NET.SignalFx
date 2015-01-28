@@ -1,11 +1,11 @@
-﻿using System.Text;
-using com.signalfuse.metrics.protobuf;
+﻿using com.signalfuse.metrics.protobuf;
 using Metrics.MetricData;
 using Metrics.Reporters;
 using Metrics.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Metrics.SignalFx

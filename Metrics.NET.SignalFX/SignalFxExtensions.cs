@@ -1,12 +1,9 @@
 ﻿using Metrics.Logging;
 using Metrics.Reports;
 using Metrics.SignalFx;
+using Metrics.SignalFX.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Net;
 
 namespace Metrics
 {
@@ -23,71 +20,50 @@ namespace Metrics
         {
             try
             {
-                var apiToken = ConfigurationManager.AppSettings["Metrics.SignalFx.APIToken"];
-                var signalFxMetricsInterval = ConfigurationManager.AppSettings["Metrics.SignalFx.Interval.Seconds"];
-                var signalFxSourceType = ConfigurationManager.AppSettings["Metrics.SignalFx.Source.Type"];
-                var signalFxSourceValue = ConfigurationManager.AppSettings["Metrics.SignalFx.Source.Value"];
-                var signalFxAWS = ConfigurationManager.AppSettings["Metrics.SignalFx.AWSIntegration"];
-                var signalFxBaseURI = ConfigurationManager.AppSettings["Metrics.SignalFx.BaseURI"];
-                var signalFxMaxDatapointsPerMessage = ConfigurationManager.AppSettings["Metrics.SignalFx.MaxDatapointsPerMessage"];
-                if (!string.IsNullOrEmpty(apiToken) && !string.IsNullOrEmpty(signalFxMetricsInterval) && !string.IsNullOrEmpty(signalFxSourceType))
+                SignalFxReporterConfiguration config = SignalFxReporterConfiguration.FromConfig();
+
+                if (config == null)
                 {
-                    int seconds;
-                    if (int.TryParse(signalFxMetricsInterval, out seconds) && seconds > 0)
+                    return reports;
+                }
+
+                IDictionary<string, string> defaultDimensions = new Dictionary<string, string>();
+                if (config.DefaultDimensions != null)
+                {
+                    foreach (DefaultDimension defaultDimension in config.DefaultDimensions)
                     {
-                        var defaultDimensionsHash = (ConfigurationManager.GetSection("SignalFx/DefaultDimensions") as System.Collections.Hashtable);
-                        IDictionary<string, string> defaultDimensions;
-                        if (defaultDimensionsHash != null)
-                        {
-                            defaultDimensions = defaultDimensionsHash.Cast<System.Collections.DictionaryEntry>()
-                            .ToDictionary(n => n.Key.ToString(), n => n.Value.ToString());
-                        }
-                        else
-                        {
-                            defaultDimensions = new Dictionary<string, string>();
-                        }
-
-                        var baseURI = signalFxBaseURI ?? SignalFxReporterBuilder.DEFAULT_URI;
-                        SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, apiToken, TimeSpan.FromSeconds(seconds));
-                        if (!string.IsNullOrEmpty(signalFxBaseURI))
-                        {
-                            builder.WithBaseURI(signalFxBaseURI);
-                        }
-
-                        if (!string.IsNullOrEmpty(signalFxMaxDatapointsPerMessage))
-                        {
-                            builder.WithMaxDatapointsPerMessage(Convert.ToInt32(signalFxMaxDatapointsPerMessage));
-                        }
-
-                        if (!string.IsNullOrEmpty(signalFxAWS) && signalFxAWS == "true")
-                        {
-                            builder.WithAWSInstanceIdDimension();
-                        }
-                        switch (signalFxSourceType)
-                        {
-                            case "netbios":
-                                builder.WithNetBiosNameSource();
-                                break;
-                            case "dns":
-                                builder.WithDNSSource();
-                                break;
-                            case "fqdn":
-                                builder.WithFQDNSource();
-                                break;
-                            case "custom":
-                                if (!string.IsNullOrEmpty(signalFxSourceValue))
-                                {
-                                    builder.WithSource(signalFxSourceValue);
-                                    break;
-                                }
-                                throw new Exception("Metrics.SignalFx.Source.Value must be set if Metrics.SignalFx.Source.Type is \"source\".");
-                            default:
-                                throw new Exception("Metrics.SignalFx.Source.Type must be one of netbios, dns, fqdn, or source(with Metrics.SignalFx.Source.Value set)");
-                        }
-                        return builder.Build();
+                        defaultDimensions.Add(defaultDimension.Name, defaultDimension.Value);
                     }
                 }
-                return reports;
+                SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, config.APIToken, config.SampleInterval);
+                builder.WithBaseURI(config.BaseURI);
+                builder.WithMaxDatapointsPerMessage(config.MaxDatapointsPerMessage);
+                if (config.AwsIntegration)
+                {
+                    builder.WithAWSInstanceIdDimension();
+                }
+                switch (config.SourceType)
+                {
+                    case SourceType.netbios:
+                        builder.WithNetBiosNameSource();
+                        break;
+                    case SourceType.dns:
+                        builder.WithDNSSource();
+                        break;
+                    case SourceType.fqdn:
+                        builder.WithFQDNSource();
+                        break;
+                    case SourceType.custom:
+                        if (!string.IsNullOrEmpty(config.SourceValue))
+                        {
+                            builder.WithSource(config.SourceValue);
+                            break;
+                        }
+                        throw new Exception("Metrics.SignalFx.Source.Value must be set if Metrics.SignalFx.Source.Type is \"source\".");
+                    default:
+                        throw new Exception("Metrics.SignalFx.Source.Type must be one of netbios, dns, fqdn, or source(with Metrics.SignalFx.Source.Value set)");
+                }
+                return builder.Build();
             }
             catch (Exception x)
             {
