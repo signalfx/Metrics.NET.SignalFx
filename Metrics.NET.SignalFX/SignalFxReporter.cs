@@ -1,52 +1,53 @@
-﻿using com.signalfuse.metrics.protobuf;
+﻿using System.Security;
+using com.signalfuse.metrics.protobuf;
 using Metrics.Logging;
 using ProtoBuf;
 using System;
 using System.IO;
 using System.Net;
+using Metrics.SignalFX.Helpers;
 
 namespace Metrics.SignalFx
 {
     public class SignalFxReporter : ISignalFxReporter
     {
         private static readonly ILog log = LogProvider.GetCurrentClassLogger();
-        private string baseURI;
         private string apiToken;
+        private IWebRequestor _requestor;
 
-        public SignalFxReporter(string baseURI, string apiToken)
+        public SignalFxReporter(string baseURI, string apiToken, IWebRequestor requestor = null)
         {
-            this.baseURI = baseURI;
+            if (requestor == null)
+            {
+                requestor = new WebRequestor(baseURI + "/v2/datapoint")
+                    .WithMethod("POST")
+                    .WithContentType("application/x-protobuf")
+                    .WithHeader("X-SF-TOKEN", apiToken);
+            }
+
+            this._requestor = requestor;
             this.apiToken = apiToken;
         }
 
         public void Send(DataPointUploadMessage msg)
         {
-            var req = WebRequest.CreateHttp(baseURI + "/v2/datapoint");
-            req.Method = "POST";
-            req.ContentType = "application/x-protobuf";
-            req.Headers.Add("X-SF-TOKEN: " + apiToken);
-            req.Proxy = null;
             try
             {
-                using (var rs = req.GetRequestStream())
+                using (var rs = _requestor.GetWriteStream())
                 {
                     Serializer.Serialize(rs, msg);
                     // flush the message before disposing
                     rs.Flush();
                 }
-
-                using (var resp = (HttpWebResponse)req.GetResponse())
+                try
                 {
-                    if (resp.StatusCode == HttpStatusCode.Forbidden)
+                    using (_requestor.Send())
                     {
-                        log.Error("API token for sending metrics to SignalFuse is invalid");
                     }
-                    if (resp.StatusCode != HttpStatusCode.OK)
-                    {
-                        Stream stream2 = resp.GetResponseStream();
-                        StreamReader reader2 = new StreamReader(stream2);
-                        MetricsErrorHandler.Handle(new Exception(reader2.ReadToEnd()));
-                    }
+                }
+                catch (SecurityException)
+                {
+                    log.Error("API token for sending metrics to SignalFuse is invalid");
                 }
             }
             catch (Exception ex)
@@ -54,12 +55,12 @@ namespace Metrics.SignalFx
                 if (ex is WebException)
                 {
                     var webex = ex as WebException;
-                    using (var exresp = (HttpWebResponse)webex.Response)
+                    using (var exresp = webex.Response)
                     {
                         if (exresp != null)
                         {
-                            Stream stream2 = exresp.GetResponseStream();
-                            StreamReader reader2 = new StreamReader(stream2);
+                            var stream2 = exresp.GetResponseStream();
+                            var reader2 = new StreamReader(stream2);
                             var errorStr = reader2.ReadToEnd();
                             log.Error(errorStr);
                         }
