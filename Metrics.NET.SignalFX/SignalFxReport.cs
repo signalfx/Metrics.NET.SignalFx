@@ -188,7 +188,7 @@ namespace Metrics.SignalFx
 
             uploadMessage.AddDatapoints(dataPoint);
 
-            if (datapointsAdded++ >= maxDatapointsPerMessage)
+            if (++datapointsAdded >= maxDatapointsPerMessage)
             {
                 this.sender.Send(uploadMessage.Build());
                 datapointsAdded = 0;
