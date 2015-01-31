@@ -4,14 +4,64 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Metrics.Core;
+using Metrics.SignalFx;
 using Xunit;
 using Metrics.NET.SignalFX.UnitTest.Fakes;
-using Metrics.SignalFx;
 
 namespace Metrics.NET.SignalFX.UnitTest
 {
     public class SignalFxReportTests
     {
+
+        [Fact]
+        public void AddMetrics_MergedMetricsAreSingularlyReported()
+        {
+            var sender = new FakeSignalFxReporter();
+            var report = new SignalFxReport(
+                             sender,
+                             "FakeApiKey",
+                             new Dictionary<string, string> {
+                    { "System", "UnitTests" }
+                }, 10000);
+
+            var tags = new MetricTags("roll=test");
+            var parentContext = new TaggedMetricsContext();
+
+            // add metrics to the same timer over and over
+            for (int i = 0; i < 100; ++i)
+            {
+                var context = new TaggedMetricsContext();
+                var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
+                timer.Record(10053, TimeUnit.Microseconds);
+                
+                var counter = context.Counter("TestCounter", Unit.KiloBytes, tags);
+                counter.Increment("SetA", 2);
+                counter.Increment("SetB", 5);
+
+                var histogram = context.Histogram("TestHistogram", Unit.Events, SamplingType.FavourRecent, tags);
+                histogram.Update(23, "ABC");
+                histogram.Update(14, "DEF");
+
+                var meter = context.Meter("TestMeter", Unit.MegaBytes, TimeUnit.Seconds, tags);
+                meter.Mark("A", 12);
+                meter.Mark("B", 190);
+
+                // merge it all together
+                parentContext.MergeContext(context);
+            }
+            var source = new CancellationTokenSource();
+            report.RunReport(parentContext.DataProvider.CurrentMetricsData, () => new HealthStatus(), source.Token);
+
+            Assert.Equal(1, sender.Count);
+            var message = sender[0];
+            
+            // timers build 17 metrics
+            // our counter builds 5
+            // histogram is 12
+            // and our meter is 17
+            Assert.Equal(51, message.DatapointsCount);
+        }
+
         [Fact]
         public void AddMetrics_EnsureAllDimensionsGetSent()
         {
