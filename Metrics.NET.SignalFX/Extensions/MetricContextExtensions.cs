@@ -38,7 +38,21 @@ namespace Metrics.SignalFx
                 context.RealHistogram(histogram).Merge(otherContext.RealHistogram(histogram));
             }
 
-            // TODO - what do we do with Gauges?
+            var contextGauges = context.DataProvider.CurrentMetricsData.Gauges.ToDictionary(gvs => gvs.Name);
+            foreach (var gauge in allMetrics.Gauges)
+            {
+                GaugeValueSource existingGauge;
+                if (contextGauges.TryGetValue(gauge.Name, out existingGauge))
+                {
+                    // the gauge already exists - so we'll just merge it
+                    existingGauge.ValueProvider.Merge(gauge.ValueProvider);
+                }
+                else
+                {
+                    var vp = gauge.ValueProvider;
+                    context.Gauge(gauge.Name, () => vp.Value, gauge.Unit, gauge.Tags);
+                }
+            }
         }
 
         private static Timer RealTimer(this MetricsContext otherContext, TimerValueSource timer)

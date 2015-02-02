@@ -38,6 +38,8 @@ namespace Metrics.NET.SignalFX.UnitTest
                 counter.Increment("SetA", 2);
                 counter.Increment("SetB", 5);
 
+                context.Gauge("TestGuage", () => 3.3, Unit.KiloBytes, tags);
+
                 var histogram = context.Histogram("TestHistogram", Unit.Events, SamplingType.FavourRecent, tags);
                 histogram.Update(23, "ABC");
                 histogram.Update(14, "DEF");
@@ -59,7 +61,7 @@ namespace Metrics.NET.SignalFX.UnitTest
             // our counter builds 5
             // histogram is 12
             // and our meter is 17
-            Assert.Equal(51, message.DatapointsCount);
+            Assert.Equal(52, message.DatapointsCount);
         }
 
         [Fact]
