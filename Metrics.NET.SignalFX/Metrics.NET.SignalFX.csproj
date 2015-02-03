@@ -50,7 +50,6 @@
     <Compile Include="Configuration\DefaultDimensionConfigurationCollection.cs" />
     <Compile Include="Configuration\SignalFxReporterConfiguration.cs" />
     <Compile Include="Configuration\SourceType.cs" />
-    <Compile Include="Extensions\MetricContextExtensions.cs" />
     <Compile Include="Helpers\IWebRequestor.cs" />
     <Compile Include="Helpers\WebRequestor.cs" />
     <Compile Include="ISignalFxReporter.cs" />
