@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using com.signalfuse.metrics.protobuf;
@@ -18,7 +17,7 @@ namespace Metrics.NET.SignalFx.UnitTest
         {
             var context = new DefaultMetricsContext();
 
-            var requestor = new FakeRequestor();
+            var requestor = new FakeRequestorFactory();
             var sender = new SignalFxReporter("http://fake.signalfuse.com", "ABC123", requestor);
             var report = new SignalFxReport(
                              sender,
@@ -52,7 +51,7 @@ namespace Metrics.NET.SignalFx.UnitTest
         {
             var context = new DefaultMetricsContext();
 
-            var requestor = new FakeAccessDeniedRequestor();
+            var requestor = new GenericFakeRequestorFactory<FakeAccessDeniedRequestor>();
             var sender = new SignalFxReporter("http://fake.signalfuse.com", "ABC123", requestor);
             var report = new SignalFxReport(
                         sender,
@@ -80,7 +79,7 @@ namespace Metrics.NET.SignalFx.UnitTest
         {
             var context = new DefaultMetricsContext();
 
-            var requestor = new FakeWebExceptionRequestor();
+            var requestor = new GenericFakeRequestorFactory<FakeWebExceptionRequestor>();
             var sender = new SignalFxReporter("http://fake.signalfuse.com", "ABC123", requestor);
             var report = new SignalFxReport(
                         sender,

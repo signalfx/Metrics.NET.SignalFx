@@ -1,5 +1,6 @@
 ﻿
 using com.signalfuse.metrics.protobuf;
+using Metrics.SignalFx.Helpers;
 
 namespace Metrics.SignalFx
 {

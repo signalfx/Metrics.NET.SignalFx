@@ -13,13 +13,14 @@ namespace Metrics.SignalFx
     {
         private static readonly ILog log = LogProvider.GetCurrentClassLogger();
         private string apiToken;
-        private IWebRequestor _requestor;
+        private IWebRequestorFactory _requestor;
 
-        public SignalFxReporter(string baseURI, string apiToken, IWebRequestor requestor = null)
+        public SignalFxReporter(string baseURI, string apiToken, IWebRequestorFactory requestor = null)
         {
             if (requestor == null)
             {
-                requestor = new WebRequestor(baseURI + "/v2/datapoint")
+                requestor = new WebRequestorFactory()
+                    .WithUri(baseURI + "/v2/datapoint")
                     .WithMethod("POST")
                     .WithContentType("application/x-protobuf")
                     .WithHeader("X-SF-TOKEN", apiToken);
@@ -33,7 +34,8 @@ namespace Metrics.SignalFx
         {
             try
             {
-                using (var rs = _requestor.GetWriteStream())
+                var request = _requestor.GetRequestor();
+                using (var rs = request.GetWriteStream())
                 {
                     Serializer.Serialize(rs, msg);
                     // flush the message before disposing
@@ -41,7 +43,7 @@ namespace Metrics.SignalFx
                 }
                 try
                 {
-                    using (_requestor.Send())
+                    using (request.Send())
                     {
                     }
                 }
