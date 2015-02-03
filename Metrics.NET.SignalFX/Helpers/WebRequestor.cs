@@ -29,7 +29,7 @@ namespace Metrics.SignalFx.Helpers
             _request.Headers.Add(name, value);
             return this;
         }
-
+        
         public Stream GetWriteStream(int contentLength)
         {
             _request.ContentLength = contentLength;
