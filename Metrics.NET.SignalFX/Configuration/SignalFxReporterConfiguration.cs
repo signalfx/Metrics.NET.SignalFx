@@ -39,7 +39,7 @@ namespace Metrics.SignalFX.Configuration
             set { this["sourceValue"] = value; }
         }
 
-        [ConfigurationProperty("baseURI", DefaultValue = "https://api.signalfuse.com", IsRequired = false)]
+        [ConfigurationProperty("baseURI", DefaultValue = "https://ingest.signalfxS.com", IsRequired = false)]
         public String BaseURI
         {
             get { return (String)this["baseURI"]; }
