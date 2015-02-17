@@ -130,6 +130,25 @@ namespace Metrics.Core
             });
         }
 
+        public bool Merge(MetricsRegistry other, bool reset)
+        {
+            // All of this is pretty much just copied and pasted with
+            // minor changes for the tags... along with most of the rest of the file
+            var tmrOther = other as TaggedMetricsRegistry;
+            if (tmrOther == null)
+            {
+                return false;
+            }
+
+            MergeCounters(tmrOther, reset);
+            MergeTimers(tmrOther, reset);
+            MergeMeters(tmrOther, reset);
+            MergeHistograms(tmrOther, reset);
+            MergeGauges(tmrOther, reset);
+
+            return true;
+        }
+
         private string TagName(string name, MetricTags? tags)
         {
             if (!tags.HasValue)
@@ -137,6 +156,120 @@ namespace Metrics.Core
                 return name;
             }
             return name + string.Join(".", tags.Value.Tags);
+        }
+
+        private void MergeCounters(TaggedMetricsRegistry tmrOther, bool reset)
+        {
+            foreach (var otherCounter in tmrOther.counters.All)
+            {
+                var counter = otherCounter;
+                var local = (CounterImplementation)counters.GetOrAdd(
+                    TagName(counter.Name, counter.Tags),
+                    () =>
+                        Tuple.Create((Counter)counter.ValueProvider,
+                            new CounterValueSource(counter.Name, counter.ValueProvider, counter.Unit, counter.Tags)));
+                if (!ReferenceEquals(local, counter.ValueProvider))
+                {
+                    // the item was already there - merge
+                    local.Merge(counter.ValueProvider);
+                }
+            }
+            if (reset)
+            {
+                tmrOther.counters.Clear();
+            }
+        }
+
+        private void MergeTimers(TaggedMetricsRegistry tmrOther, bool reset)
+        {
+            foreach (var otherTimer in tmrOther.timers.All)
+            {
+                var timer = otherTimer;
+                // we know that we create a TimerValueSource, which in turn, creates a ScaledValueProvider against the real timer
+                var timerProvider = (ScaledValueProvider<TimerValue>) timer.ValueProvider;
+                var local = (TimerImplementation)timers.GetOrAdd(
+                    TagName(timer.Name, timer.Tags),
+                    () =>
+                        Tuple.Create((Timer)timerProvider.ValueProvider,
+                            new TimerValueSource(timer.Name, timerProvider.ValueProvider, timer.Unit, timer.RateUnit, timer.DurationUnit, timer.Tags)));
+                if (!ReferenceEquals(local, timerProvider.ValueProvider))
+                {
+                    // the item was already there - merge
+                    local.Merge(timerProvider.ValueProvider);
+                }
+            }
+            if (reset)
+            {
+                tmrOther.timers.Clear();
+            }
+        }
+
+        private void MergeMeters(TaggedMetricsRegistry tmrOther, bool reset)
+        {
+            foreach (var otherMeter in tmrOther.meters.All)
+            {
+                var meter = otherMeter;
+                // we know that we create a MeterValueSource, which in turn, creates a ScaledValueProvider against the real meter
+                var meterProvider = (ScaledValueProvider<MeterValue>)meter.ValueProvider;
+                var local = (MeterImplementation)meters.GetOrAdd(
+                    TagName(meter.Name, meter.Tags),
+                    () =>
+                        Tuple.Create((Meter)meterProvider.ValueProvider,
+                            new MeterValueSource(meter.Name, meterProvider.ValueProvider, meter.Unit, meter.RateUnit, meter.Tags)));
+                if (!ReferenceEquals(local, meterProvider.ValueProvider))
+                {
+                    // the item was already there - merge
+                    local.Merge(meterProvider.ValueProvider);
+                }
+            }
+            if (reset)
+            {
+                tmrOther.meters.Clear();
+            }
+        }
+
+        private void MergeHistograms(TaggedMetricsRegistry tmrOther, bool reset)
+        {
+            foreach (var otherHist in tmrOther.histograms.All)
+            {
+                var histogram = otherHist;
+                var local = (HistogramImplementation)histograms.GetOrAdd(
+                    TagName(histogram.Name, histogram.Tags),
+                    () =>
+                        Tuple.Create((Histogram)histogram.ValueProvider,
+                            new HistogramValueSource(histogram.Name, histogram.ValueProvider, histogram.Unit, histogram.Tags)));
+                if (!ReferenceEquals(local, histogram.ValueProvider))
+                {
+                    // the item was already there - merge
+                    local.Merge(histogram.ValueProvider);
+                }
+            }
+            if (reset)
+            {
+                tmrOther.histograms.Clear();
+            }
+        }
+
+        private void MergeGauges(TaggedMetricsRegistry tmrOther, bool reset)
+        {
+            foreach (var otherGauge in tmrOther.gauges.All)
+            {
+                var gauge = otherGauge;
+                var local = (GaugeImplementation)gauges.GetOrAdd(
+                    TagName(gauge.Name, gauge.Tags),
+                    () =>
+                        Tuple.Create(gauge.ValueProvider,
+                            new GaugeValueSource(gauge.Name, gauge.ValueProvider, gauge.Unit, gauge.Tags)));
+                if (!ReferenceEquals(local, gauge.ValueProvider))
+                {
+                    // the item was already there - merge
+                    local.Merge(gauge.ValueProvider);
+                }
+            }
+            if (reset)
+            {
+                tmrOther.gauges.Clear();
+            }
         }
 
         public void ClearAllMetrics()

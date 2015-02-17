@@ -50,6 +50,10 @@
     <Compile Include="Configuration\DefaultDimensionConfigurationCollection.cs" />
     <Compile Include="Configuration\SignalFxReporterConfiguration.cs" />
     <Compile Include="Configuration\SourceType.cs" />
+    <Compile Include="Helpers\IWebRequestor.cs" />
+    <Compile Include="Helpers\IWebRequestorFactory.cs" />
+    <Compile Include="Helpers\WebRequestor.cs" />
+    <Compile Include="Helpers\WebRequestorFactory.cs" />
     <Compile Include="ISignalFxReporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignalFuseProtocolBuffers.cs" />

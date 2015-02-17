@@ -48,8 +48,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fakes\FakeRequestorFactory.cs" />
+    <Compile Include="Fakes\FakeWebExceptionRequestor.cs" />
+    <Compile Include="Fakes\FakeAccessDeniedRequestor.cs" />
+    <Compile Include="Fakes\FakeRequestor.cs" />
+    <Compile Include="Fakes\FakeWebResponse.cs" />
+    <Compile Include="Fakes\GenericFakeRequestorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Fakes\FakeSignalFxReporter.cs" />
+    <Compile Include="SignalFxReporterTests.cs" />
     <Compile Include="SignalFxReportTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
