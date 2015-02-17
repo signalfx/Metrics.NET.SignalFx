@@ -33,22 +33,25 @@ namespace Metrics.SignalFx
         {
             try
             {
-                var request = _requestor.GetRequestor();
-                using (var rs = request.GetWriteStream(msg.SerializedSize))
+                using (var request = _requestor.GetRequestor())
                 {
-                    msg.WriteTo(rs);
-                    // flush the message before disposing
-                    rs.Flush();
-                }
-                try
-                {
-                    using (request.Send())
+                    using (var rs = request.GetWriteStream(msg.SerializedSize))
                     {
+                        msg.WriteTo(rs);
+                        // flush the message before disposing
+                        rs.Flush();
+                        rs.Close();
                     }
-                }
-                catch (SecurityException)
-                {
-                    log.Error("API token for sending metrics to SignalFuse is invalid");
+                    try
+                    {
+                        using (request.Send())
+                        {
+                        }
+                    }
+                    catch (SecurityException)
+                    {
+                        log.Error("API token for sending metrics to SignalFuse is invalid");
+                    }
                 }
             }
             catch (Exception ex)

@@ -17,14 +17,15 @@ namespace Metrics.SignalFx
         private static readonly string SOURCE_DIMENSION = "source";
         private static readonly string SF_SOURCE = "sf_source";
         private static readonly HashSet<string> IGNORE_DIMENSIONS = new HashSet<string>();
+
+        private static readonly Regex invalid = new Regex(@"[^a-zA-Z0-9\-_]+", RegexOptions.CultureInvariant | RegexOptions.Compiled);
+        private static readonly Regex slash = new Regex(@"\s*/\s*", RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
         static SignalFxReport()
         {
             IGNORE_DIMENSIONS.Add(SOURCE_DIMENSION);
             IGNORE_DIMENSIONS.Add(METRIC_DIMENSION);
         }
-
-        private static readonly Regex invalid = new Regex(@"[^a-zA-Z0-9\-_]+", RegexOptions.CultureInvariant | RegexOptions.Compiled);
-        private static readonly Regex slash = new Regex(@"\s*/\s*", RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
         private readonly ISignalFxReporter sender;
         private readonly String defaultSource;
@@ -32,8 +33,7 @@ namespace Metrics.SignalFx
         private readonly int maxDatapointsPerMessage;
         private DataPointUploadMessage.Builder uploadMessage;
         private int datapointsAdded = 0;
-
-
+        
         public SignalFxReport(ISignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions, int maxDatapointsPerMessage)
         {
             this.sender = sender;
@@ -44,7 +44,7 @@ namespace Metrics.SignalFx
 
         protected override void StartReport(string contextName)
         {
-            this.uploadMessage = DataPointUploadMessage.CreateBuilder();
+            Reset();
             base.StartReport(contextName);
         }
 
@@ -52,6 +52,7 @@ namespace Metrics.SignalFx
         {
             base.EndReport(contextName);
             this.sender.Send(uploadMessage.Build());
+            uploadMessage = null;
         }
 
         protected override void ReportGauge(string name, double value, Unit unit, MetricTags tags)
@@ -192,8 +193,13 @@ namespace Metrics.SignalFx
             {
                 this.sender.Send(uploadMessage.Build());
                 datapointsAdded = 0;
-                this.uploadMessage = DataPointUploadMessage.CreateBuilder();
+                Reset();
             }
+        }
+
+        internal void Reset()
+        {
+            this.uploadMessage = DataPointUploadMessage.CreateBuilder();
         }
 
         protected virtual void AddDimensions(DataPoint.Builder dataPoint, IDictionary<string, string> dimensions)

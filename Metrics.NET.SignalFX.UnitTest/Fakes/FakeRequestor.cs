@@ -29,6 +29,10 @@ namespace Metrics.NET.SignalFX.UnitTest.Fakes
             return new MemoryStream(Encoding.UTF8.GetBytes(ResponseData));
         }
 
+        public void Dispose()
+        {
+        }
+
         private readonly MemoryStream _writeStream;
     }
 }

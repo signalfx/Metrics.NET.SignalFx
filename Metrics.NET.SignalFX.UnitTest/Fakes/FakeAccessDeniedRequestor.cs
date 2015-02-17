@@ -17,5 +17,9 @@ namespace Metrics.NET.SignalFX.UnitTest.Fakes
         {
             throw new SecurityException("Y U No Send good API Key!");
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

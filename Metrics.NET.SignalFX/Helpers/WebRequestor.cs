@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.IO;
 using System.Net;
 using System.Security;
@@ -38,16 +39,16 @@ namespace Metrics.SignalFx.Helpers
 
         public Stream Send()
         {
-            var resp = (HttpWebResponse)_request.GetResponse();
-            if (resp.StatusCode != HttpStatusCode.OK)
+            _response = (HttpWebResponse)_request.GetResponse();
+            if (_response.StatusCode != HttpStatusCode.OK)
             {
-                if (resp.StatusCode == HttpStatusCode.Forbidden)
+                if (_response.StatusCode == HttpStatusCode.Forbidden)
                 {
-                    throw new SecurityException("HTTP 403: " + resp.StatusDescription);
+                    throw new SecurityException("HTTP 403: " + _response.StatusDescription);
                 }
-                throw new WebException(resp.StatusDescription, null, WebExceptionStatus.UnknownError, resp);
+                throw new WebException(_response.StatusDescription, null, WebExceptionStatus.UnknownError, _response);
             }
-            return resp.GetResponseStream();
+            return _response.GetResponseStream();
         }
 
         public WebRequestor WithTimeout(int timeoutInMilliseconds)
@@ -56,6 +57,22 @@ namespace Metrics.SignalFx.Helpers
             return this;
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool isFinalizer)
+        {
+            _request.Abort();
+            if (_response != null)
+            {
+                _response.Dispose();
+            }
+        }
+
+        private HttpWebResponse _response;
         private HttpWebRequest _request;
     }
 }

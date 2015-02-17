@@ -119,11 +119,15 @@ namespace Metrics.SignalFx
                     .WithTimeout(1000*60)
                     .WithMethod("GET");
             }
-            using (var resp = awsRequestor.Send())
+
+            using (awsRequestor)
             {
-                string source = new StreamReader(resp).ReadToEnd();
-                defaultDimensions[INSTANCE_ID_DIMENSION] = source;
-                return this;
+                using (var resp = awsRequestor.Send())
+                {
+                    string source = new StreamReader(resp).ReadToEnd();
+                    defaultDimensions[INSTANCE_ID_DIMENSION] = source;
+                    return this;
+                }
             }
         }
 

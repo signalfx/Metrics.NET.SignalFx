@@ -26,5 +26,9 @@ namespace Metrics.NET.SignalFX.UnitTest.Fakes
                 resp
                 );
         }
+
+        public void Dispose()
+        {
+        }
     }
 }
