@@ -38,6 +38,7 @@ namespace Metrics
                 SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, config.APIToken, config.SampleInterval);
                 builder.WithBaseURI(config.BaseURI);
                 builder.WithMaxDatapointsPerMessage(config.MaxDatapointsPerMessage);
+                builder.WithDefaultDimensions(defaultDimensions);
                 if (config.AwsIntegration)
                 {
                     builder.WithAWSInstanceIdDimension();
