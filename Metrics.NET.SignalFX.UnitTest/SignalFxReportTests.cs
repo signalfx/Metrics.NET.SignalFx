@@ -39,5 +39,41 @@ namespace Metrics.NET.SignalFX.UnitTest
             var dm = dp.DimensionsList.FirstOrDefault(dimension => dimension.Key == "test=string");
             Assert.Equal("testvalue", dm.Value);
         }
+
+        [Fact]
+        public void AddMetrics_TestNoEqualTagNotAddedAsDimension()
+        {
+            var context = new DefaultMetricsContext();
+            var sender = new FakeSignalFxReporter();
+            var report = new SignalFxReport(
+                             sender,
+                             "FakeApiKey",
+                             new Dictionary<string, string> {
+                    { "System", "UnitTests" }
+                }, 10000);
+
+            var tags = new MetricTags("test=string,noequal");
+
+            var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
+            timer.Record(10053, TimeUnit.Microseconds);
+
+            var source = new CancellationTokenSource();
+            report.RunReport(context.DataProvider.CurrentMetricsData, () => new HealthStatus(), source.Token);
+
+            Assert.Equal(1, sender.Count);
+            var message = sender[0];
+
+            var dp = message.DatapointsList.FirstOrDefault(datapoint => datapoint.DimensionsList.Any(dimension => dimension.Key == "test"));
+            Assert.NotNull(dp);
+
+            var dp1 = message.DatapointsList.FirstOrDefault(datapoint => datapoint.DimensionsList.Any(dimension => dimension.Key == "noequal"));
+            Assert.Null(dp1);
+
+            var dm = dp.DimensionsList.FirstOrDefault(dimension => dimension.Key == "test");
+            Assert.Equal("string", dm.Value);
+
+            dm = dp.DimensionsList.FirstOrDefault(dimension => dimension.Key == "noequal");
+            Assert.Null(dm);
+        }
     }
 }

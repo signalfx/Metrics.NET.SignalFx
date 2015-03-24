@@ -200,7 +200,7 @@ namespace Metrics.SignalFx
         {
             foreach (KeyValuePair<string, string> entry in dimensions)
             {
-                if (!IGNORE_DIMENSIONS.Contains(entry.Key))
+                if (!IGNORE_DIMENSIONS.Contains(entry.Key) && !string.IsNullOrEmpty(entry.Value))
                 {
                     AddDimension(dataPoint, entry.Key, entry.Value);
                 }
