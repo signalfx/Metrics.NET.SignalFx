@@ -65,7 +65,7 @@ namespace Metrics.NET.SignalFx.UnitTest
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
                 }, 50);
-            
+
             var accountNoRandom = new Random();
             // 
             var accountId = new byte[16];
@@ -149,7 +149,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var histogram = context.Histogram("TestHistogram", Unit.Events, SamplingType.FavourRecent, tags);
             histogram.Update(23, "ABC");
             histogram.Update(14, "DEF");
-            
+
             // Histogram of events produces 12 metrics:
             //   Count-Events
             //   Last-Events
@@ -191,7 +191,7 @@ namespace Metrics.NET.SignalFx.UnitTest
 
             Assert.Equal(1, sender.Count);
             var message = sender[0];
-             
+
             Assert.Equal(totalExpectedMetrics, message.datapoints.Count);
         }
 
@@ -201,7 +201,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var context = new DefaultMetricsContext();
             var sender = new FakeSignalFxReporter();
             var report = new SignalFxReport(
-                             sender, 
+                             sender,
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
@@ -211,7 +211,7 @@ namespace Metrics.NET.SignalFx.UnitTest
 
             var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
             timer.Record(10053, TimeUnit.Microseconds);
-            
+
             var source = new CancellationTokenSource();
             report.RunReport(context.DataProvider.CurrentMetricsData, () => new HealthStatus(), source.Token);
 

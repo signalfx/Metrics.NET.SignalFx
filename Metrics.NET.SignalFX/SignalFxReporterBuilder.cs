@@ -116,7 +116,7 @@ namespace Metrics.SignalFx
             if (awsRequestor == null)
             {
                 awsRequestor = new WebRequestor("http://169.254.169.254/latest/meta-data/instance-id")
-                    .WithTimeout(1000*60)
+                    .WithTimeout(1000 * 60)
                     .WithMethod("GET");
             }
             using (var resp = awsRequestor.Send())
