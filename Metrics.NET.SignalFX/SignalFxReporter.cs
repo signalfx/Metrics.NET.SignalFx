@@ -1,5 +1,6 @@
 ﻿using com.signalfuse.metrics.protobuf;
 using Metrics.Logging;
+using ProtoBuf;
 using System;
 using System.IO;
 using System.Net;
@@ -24,13 +25,12 @@ namespace Metrics.SignalFx
             req.Method = "POST";
             req.ContentType = "application/x-protobuf";
             req.Headers.Add("X-SF-TOKEN: " + apiToken);
-            req.ContentLength = msg.SerializedSize;
             req.Proxy = null;
             try
             {
                 using (var rs = req.GetRequestStream())
                 {
-                    msg.WriteTo(rs);
+                    Serializer.Serialize(rs, msg);
                     // flush the message before disposing
                     rs.Flush();
                 }

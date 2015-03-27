@@ -36,16 +36,17 @@
     <RootNamespace>Metrics.SignalFX</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Google.ProtocolBuffers">
-      <HintPath>..\packages\Google.ProtocolBuffers.2.4.1.521\lib\net40\Google.ProtocolBuffers.dll</HintPath>
-    </Reference>
     <Reference Include="Metrics">
       <HintPath>..\packages\Metrics.NET.0.2.14\lib\net45\Metrics.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\DefaultDimension.cs" />
@@ -71,7 +72,7 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>cd $(ProjectDir) &amp;&amp; powershell -Command if (!(Test-Path SignalFuseProtocolBuffers.cs) -or (Get-Item signal_fuse_protocol_buffers.proto).LastWriteTimeUtc -gt (Get-Item  SignalFuseProtocolBuffers.cs).LastWriteTimeUtc) {$(ProjectDir)\protobuf-csharp\tools\protogen $(ProjectDir)/signal_fuse_protocol_buffers.proto --proto_path=$(ProjectDir)  -output_directory=$(ProjectDir) }</PreBuildEvent>
+    <PreBuildEvent>cd $(ProjectDir) &amp;&amp; powershell -Command if (!(Test-Path SignalFuseProtocolBuffers.cs) -or (Get-Item signal_fuse_protocol_buffers.proto).LastWriteTimeUtc -gt (Get-Item  SignalFuseProtocolBuffers.cs).LastWriteTimeUtc) {$(ProjectDir)\..\protobuf-net\bin\protogen -i:signal_fuse_protocol_buffers.proto  -o:SignalFuseProtocolBuffers.cs -p:detectMissing }</PreBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

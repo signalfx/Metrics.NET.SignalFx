@@ -30,7 +30,7 @@ namespace Metrics.SignalFx
         private readonly String defaultSource;
         private readonly IDictionary<string, string> defaultDimensions;
         private readonly int maxDatapointsPerMessage;
-        private DataPointUploadMessage.Builder uploadMessage;
+        private DataPointUploadMessage uploadMessage;
         private int datapointsAdded = 0;
 
 
@@ -44,14 +44,14 @@ namespace Metrics.SignalFx
 
         protected override void StartReport(string contextName)
         {
-            this.uploadMessage = DataPointUploadMessage.CreateBuilder();
+            this.uploadMessage = new DataPointUploadMessage();
             base.StartReport(contextName);
         }
 
         protected override void EndReport(string contextName)
         {
             base.EndReport(contextName);
-            this.sender.Send(uploadMessage.Build());
+            this.sender.Send(uploadMessage);
         }
 
         protected override void ReportGauge(string name, double value, Unit unit, MetricTags tags)
@@ -158,45 +158,45 @@ namespace Metrics.SignalFx
 
         protected virtual void Add(string name, double value, com.signalfuse.metrics.protobuf.MetricType metricType, MetricTags tags)
         {
-            Datum.Builder datum = Datum.CreateBuilder();
-            datum.SetDoubleValue(value);
-            Add(datum.Build(), name, metricType, tags);
+            Datum datum = new Datum();
+            datum.doubleValue = value;
+            Add(datum, name, metricType, tags);
         }
 
         protected virtual void Add(string name, long value, com.signalfuse.metrics.protobuf.MetricType metricType, MetricTags tags)
         {
-            Datum.Builder datum = Datum.CreateBuilder();
-            datum.SetIntValue(value);
+            Datum datum = new Datum();
+            datum.intValue = value;
 
-            Add(datum.Build(), name, metricType, tags);
+            Add(datum, name, metricType, tags);
         }
 
         protected virtual void Add(Datum value, string name, com.signalfuse.metrics.protobuf.MetricType metricType, MetricTags tags)
         {
             IDictionary<string, string> dimensions = ParseTagsToDimensions(tags);
-            DataPoint.Builder dataPoint = DataPoint.CreateBuilder();
-            dataPoint.SetValue(value);
+            DataPoint dataPoint = new DataPoint();
+            dataPoint.value = value;
             string metricName = dimensions.ContainsKey(METRIC_DIMENSION) ? dimensions[METRIC_DIMENSION] : name;
             string sourceName = dimensions.ContainsKey(SOURCE_DIMENSION) ? dimensions[SOURCE_DIMENSION] : defaultSource;
-            dataPoint.SetMetric(metricName);
-            dataPoint.SetMetricType(metricType);
-            dataPoint.SetSource(sourceName);
+            dataPoint.metric = metricName;
+            dataPoint.metricType = metricType;
+            dataPoint.source = sourceName;
             AddDimension(dataPoint, SF_SOURCE, sourceName);
 
             AddDimensions(dataPoint, defaultDimensions);
             AddDimensions(dataPoint, dimensions);
 
-            uploadMessage.AddDatapoints(dataPoint);
+            uploadMessage.datapoints.Add(dataPoint);
 
             if (datapointsAdded++ >= maxDatapointsPerMessage)
             {
-                this.sender.Send(uploadMessage.Build());
+                this.sender.Send(uploadMessage);
                 datapointsAdded = 0;
-                this.uploadMessage = DataPointUploadMessage.CreateBuilder();
+                this.uploadMessage = new DataPointUploadMessage();
             }
         }
 
-        protected virtual void AddDimensions(DataPoint.Builder dataPoint, IDictionary<string, string> dimensions)
+        protected virtual void AddDimensions(DataPoint dataPoint, IDictionary<string, string> dimensions)
         {
             foreach (KeyValuePair<string, string> entry in dimensions)
             {
@@ -218,12 +218,12 @@ namespace Metrics.SignalFx
             return retVal;
         }
 
-        protected virtual void AddDimension(DataPoint.Builder dataPoint, string key, string value)
+        protected virtual void AddDimension(DataPoint dataPoint, string key, string value)
         {
-            Dimension.Builder dimension = Dimension.CreateBuilder();
-            dimension.SetKey(key);
-            dimension.SetValue(value);
-            dataPoint.AddDimensions(dimension);
+            Dimension dimension = new Dimension();
+            dimension.key = key;
+            dimension.value = value;
+            dataPoint.dimensions.Add(dimension);
         }
 
         protected virtual string AsRate(Unit unit, TimeUnit rateUnit)

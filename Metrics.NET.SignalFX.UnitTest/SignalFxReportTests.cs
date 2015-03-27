@@ -33,11 +33,11 @@ namespace Metrics.NET.SignalFX.UnitTest
             Assert.Equal(1, sender.Count);
             var message = sender[0];
 
-            var dp = message.DatapointsList.FirstOrDefault(datapoint => datapoint.DimensionsList.Any(dimension => dimension.Key == "test=string"));
+            var dp = message.datapoints.FirstOrDefault(datapoint => datapoint.dimensions.Any(dimension => dimension.key == "test=string"));
             Assert.NotNull(dp);
 
-            var dm = dp.DimensionsList.FirstOrDefault(dimension => dimension.Key == "test=string");
-            Assert.Equal("testvalue", dm.Value);
+            var dm = dp.dimensions.FirstOrDefault(dimension => dimension.key == "test=string");
+            Assert.Equal("testvalue", dm.value);
         }
 
         [Fact]
@@ -63,16 +63,16 @@ namespace Metrics.NET.SignalFX.UnitTest
             Assert.Equal(1, sender.Count);
             var message = sender[0];
 
-            var dp = message.DatapointsList.FirstOrDefault(datapoint => datapoint.DimensionsList.Any(dimension => dimension.Key == "test"));
+            var dp = message.datapoints.FirstOrDefault(datapoint => datapoint.dimensions.Any(dimension => dimension.key == "test"));
             Assert.NotNull(dp);
 
-            var dp1 = message.DatapointsList.FirstOrDefault(datapoint => datapoint.DimensionsList.Any(dimension => dimension.Key == "noequal"));
+            var dp1 = message.datapoints.FirstOrDefault(datapoint => datapoint.dimensions.Any(dimension => dimension.key == "noequal"));
             Assert.Null(dp1);
 
-            var dm = dp.DimensionsList.FirstOrDefault(dimension => dimension.Key == "test");
-            Assert.Equal("string", dm.Value);
+            var dm = dp.dimensions.FirstOrDefault(dimension => dimension.key == "test");
+            Assert.Equal("string", dm.value);
 
-            dm = dp.DimensionsList.FirstOrDefault(dimension => dimension.Key == "noequal");
+            dm = dp.dimensions.FirstOrDefault(dimension => dimension.key == "noequal");
             Assert.Null(dm);
         }
     }
