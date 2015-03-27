@@ -29,6 +29,6 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("0.0.1.4")]
-[assembly: AssemblyFileVersion("0.0.1.4")]
+[assembly: AssemblyVersion("0.0.2.0")]
+[assembly: AssemblyFileVersion("0.0.2.0")]
 [assembly: InternalsVisibleTo("Metrics.NET.SignalFX.UnitTest")]
