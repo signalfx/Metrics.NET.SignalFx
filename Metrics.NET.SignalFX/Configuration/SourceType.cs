@@ -1,5 +1,5 @@
 ﻿
-namespace Metrics.SignalFX.Configuration
+namespace Metrics.SignalFx.Configuration
 {
     public enum SourceType
     {

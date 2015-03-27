@@ -31,4 +31,4 @@ using System.Runtime.InteropServices;
 //
 [assembly: AssemblyVersion("0.0.2.0")]
 [assembly: AssemblyFileVersion("0.0.2.0")]
-[assembly: InternalsVisibleTo("Metrics.NET.SignalFX.UnitTest")]
+[assembly: InternalsVisibleTo("Metrics.NET.SignalFx.UnitTest")]

@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 
-namespace Metrics.NET.SignalFX.UnitTest.Fakes
+namespace Metrics.NET.SignalFx.UnitTest.Fakes
 {
     public class FakeWebResponse : WebResponse
     {

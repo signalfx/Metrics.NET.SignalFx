@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using Metrics.SignalFX.Helpers;
+using Metrics.SignalFx.Helpers;
 
 namespace Metrics.SignalFx
 {

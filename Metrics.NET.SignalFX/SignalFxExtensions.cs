@@ -1,7 +1,7 @@
 ﻿using Metrics.Logging;
 using Metrics.Reports;
 using Metrics.SignalFx;
-using Metrics.SignalFX.Configuration;
+using Metrics.SignalFx.Configuration;
 using System;
 using System.Collections.Generic;
 

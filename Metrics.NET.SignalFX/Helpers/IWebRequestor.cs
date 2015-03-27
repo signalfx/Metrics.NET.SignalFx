@@ -1,7 +1,7 @@
 ﻿
 using System.IO;
 
-namespace Metrics.SignalFX.Helpers
+namespace Metrics.SignalFx.Helpers
 {
     public interface IWebRequestor
     {

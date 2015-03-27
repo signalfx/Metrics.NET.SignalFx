@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading;
 using Metrics.Core;
 using Xunit;
-using Metrics.NET.SignalFX.UnitTest.Fakes;
+using Metrics.NET.SignalFx.UnitTest.Fakes;
 using Metrics.SignalFx;
 
-namespace Metrics.NET.SignalFX.UnitTest
+namespace Metrics.NET.SignalFx.UnitTest
 {
     public class SignalFxReportTests
     {

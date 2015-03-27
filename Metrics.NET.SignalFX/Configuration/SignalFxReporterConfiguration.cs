@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace Metrics.SignalFX.Configuration
+namespace Metrics.SignalFx.Configuration
 {
     public class SignalFxReporterConfiguration : ConfigurationSection
     {

@@ -2,7 +2,7 @@
 using Metrics.SignalFx;
 using com.signalfuse.metrics.protobuf;
 
-namespace Metrics.NET.SignalFX.UnitTest.Fakes
+namespace Metrics.NET.SignalFx.UnitTest.Fakes
 {
     internal class FakeSignalFxReporter : List<DataPointUploadMessage>, ISignalFxReporter
     {

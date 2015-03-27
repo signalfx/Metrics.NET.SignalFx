@@ -4,9 +4,9 @@ using System.IO;
 using System.Net;
 using System.Security;
 using System.Text;
-using Metrics.SignalFX.Helpers;
+using Metrics.SignalFx.Helpers;
 
-namespace Metrics.NET.SignalFX.UnitTest.Fakes
+namespace Metrics.NET.SignalFx.UnitTest.Fakes
 {
     public class FakeWebExceptionRequestor : IWebRequestor
     {

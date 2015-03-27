@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using com.signalfuse.metrics.protobuf;
-using Metrics.NET.SignalFX.UnitTest.Fakes;
+using Metrics.NET.SignalFx.UnitTest.Fakes;
 using Metrics.SignalFx;
 using Xunit;
 using ProtoBuf;
 using System.IO;
 
-namespace Metrics.NET.SignalFX.UnitTest
+namespace Metrics.NET.SignalFx.UnitTest
 {
     public class SignalFxReporterTests
     {

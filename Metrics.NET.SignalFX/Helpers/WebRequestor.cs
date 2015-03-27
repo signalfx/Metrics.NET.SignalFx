@@ -3,7 +3,7 @@ using System.IO;
 using System.Net;
 using System.Security;
 
-namespace Metrics.SignalFX.Helpers
+namespace Metrics.SignalFx.Helpers
 {
     public class WebRequestor : IWebRequestor
     {
