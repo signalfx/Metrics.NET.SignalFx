@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Metrics.NET.SignalFX")]
-[assembly: AssemblyDescription("SignalFuse Reporter for Metrics.NET")]
+[assembly: AssemblyDescription("SignalFx Reporter for Metrics.NET")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("SignalFuse Inc")]
+[assembly: AssemblyCompany("SignalFx Inc")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright (C) 2014 SignalFuse, Inc.")]
+[assembly: AssemblyCopyright("Copyright (C) 2015 SignalFx, Inc.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
