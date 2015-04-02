@@ -92,7 +92,7 @@ top of your App.Config file.
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
   <configSections>
-    <section name="signalFxReporter" type=" Metrics.SignalFX.Configuration.SignalFxReporterConfiguration, Metrics.NET.SignalFX"/>
+    <section name="signalFxReporter" type=" Metrics.SignalFx.Configuration.SignalFxReporterConfiguration, Metrics.NET.SignalFx"/>
   </configSsections>
   ....
 </configuration>
