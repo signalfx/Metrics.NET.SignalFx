@@ -13,7 +13,7 @@ namespace Metrics.SignalFx
     /// </summary>
     public class SignalFxReporterBuilder
     {
-        private static readonly string DEFAULT_URI = "https://api.signalfuse.com";
+        private static readonly string DEFAULT_URI = "https://ingest.signalfx.com";
         private static readonly int MAX_DATAPOINTS_PER_MESSAGE = 10000;
         private static readonly string INSTANCE_ID_DIMENSION = "InstanceId";
 
