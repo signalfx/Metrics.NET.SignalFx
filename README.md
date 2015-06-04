@@ -20,7 +20,7 @@ public void setupCounters(string env) {
     this.purchaseAPICount = getContext().Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
 }
 ```
-This will create a context called "app" so metrics reported will be <hostname>.app.api.use.
+This will create a context called "app" so metrics reported will look like "yourhostname.app.api.use".
 This will allow you to see all of of your api.use metrics together or split it out by environment or by api_type.
 
 ##Configuring the SignalFxReporter
