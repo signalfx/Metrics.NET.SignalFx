@@ -1,18 +1,24 @@
 #Metrics.NET.SignalFX
 ## What is the SignalFX Reporter for Metrics.NET
-
+S
 The Metrics.NET library provides a way of instrumenting applications with custom metrics (timers, histograms, counters etc) that can be reported in various ways and can provide insights on what is happening inside a running application.
 
-This assembly provides a mechanism to report the metrics gathered by Metrics.NET to SignalFuse.
+This assembly provides a mechanism to report the metrics gathered by Metrics.NET to SignalFx.
 
-##Sending Diemnsions
-In order to send diemnsions to SignalFuse with Metrics.NET you use the MetricTags object. MetricTags are currently a list of strings. To send a dimension just add a string that looks like "key=value" to the MetricTags object you use to initialize your metrics. E.g
+##Sending Dimensions
+In order to send dimensions to SignalFx with Metrics.NET you use the MetricTags object and use Metrics.Core.TaggedMetricsContext. This unfortunately(currently) means that you will to have a second context (think . in metric name). MetricTags are currently a list of strings. To send a dimension just add a string that looks like "key=value" to the MetricTags object you use to initialize your metrics. E.g
 
 ```csharp
+
+public MetricContext getContext() {
+   MetricsContext context = Metric.Context("somename", (ctxName) => { return new TaggedMetricsContext(ctxName); });
+}
+
 //Setup counters for API usage
 public void setupCounters(string env) {
-    this,loginAPICount = Metric.Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
-    this.purchaseAPICount = Metric.Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
+
+    this,loginAPICount = getContext().Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
+    this.purchaseAPICount = getContext().Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
 }
 ```
 This will allow you to see all of of your api.use metrics together or split it out by environment or by api_type.
@@ -23,20 +29,20 @@ To configure Metrics.Net to report you need to set up two things
  - The default source
 
 ###Your SignalFX API Token
-Your API SignalFX API token is available if you click on your avatar in the SignalFuse UI.
+Your API SignalFX API token is available if you click on your avatar in the SignalFx UI.
 
 ###Default source name
-When reporting to SignalFuse we need to associate the reported metrics to a "source". Some choices are:
+When reporting to SignalFx we need to associate the reported metrics to a "source". Some choices are:
  - NetBIOS Name
  - DNS Name
  - FQDN
  - Custom Source
 
 ###AWS Integration
-If your code will be running on an AWS instance and you have integrated SignalFuse with AWS. You can configure the Metrics.Net.SignalFX reporter to send the instance id as one of the dimensions so that you can use the discovered AWS instance attributes to filter and group metrics.
+If your code will be running on an AWS instance and you have integrated SignalFx with AWS. You can configure the Metrics.Net.SignalFX reporter to send the instance id as one of the dimensions so that you can use the discovered AWS instance attributes to filter and group metrics.
 
 ###Default Dimensions
-If there are dimeensions that you wish to send on all the metrics that you report to SignalFuse. You can configure a set of "default dimensions" when you configure the SignalFXReporter
+If there are dimeensions that you wish to send on all the metrics that you report to SignalFx. You can configure a set of "default dimensions" when you configure the SignalFXReporter
 
 ###C# Configuration
 ####Basic Configuration
@@ -100,7 +106,7 @@ top of your App.Config file.
 
 Next you need to add a <signalFxReporter> stanza
 You must specify the following attributes:
- - apiToken - Your SignalFuse token
+ - apiToken - Your SignalFx token
  - sourceType - How you would like to configure the default source. Your choices are:
   - netbios
   - dns
@@ -108,9 +114,9 @@ You must specify the following attributes:
   - custom - If you specify this you must also specify the "sourceValue" attribute to specify the custom source.
 
 The following attributes are optional
- - sampleInterval - TimeSpan (defaults to 00:00:05, mininum 00:00:01) How often to report metrics to SignalFuse
+ - sampleInterval - TimeSpan (defaults to 00:00:05, mininum 00:00:01) How often to report metrics to SignalFx
  - maxDatapointPerMessage - Integer (defaults to 10000, min 1, max 10000) The maximumum of points to report per message
-                            to SignalFuse
+                            to SignalFx
  - awsIntegration - Boolean (default to false) If set to true then the AWS integration will be turned on. 
 E.g
 ```xml
