@@ -1,10 +1,11 @@
 ﻿
-using Metrics.Reports;
+using Metrics.Logging;
+using Metrics.Reporters;
+using Metrics.SignalFx.Configuration;
+using Metrics.SignalFx.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using Metrics.SignalFx.Helpers;
 
 namespace Metrics.SignalFx
 {
@@ -13,11 +14,11 @@ namespace Metrics.SignalFx
     /// </summary>
     public class SignalFxReporterBuilder
     {
+        private static readonly ILog log = LogProvider.GetCurrentClassLogger();
         private static readonly string DEFAULT_URI = "https://ingest.signalfx.com";
         private static readonly int MAX_DATAPOINTS_PER_MESSAGE = 10000;
         private static readonly string INSTANCE_ID_DIMENSION = "InstanceId";
 
-        private MetricsReports reports;
         private string apiToken;
         private TimeSpan interval;
         private IDictionary<string, string> defaultDimensions = new Dictionary<string, string>();
@@ -28,9 +29,8 @@ namespace Metrics.SignalFx
         /// <summary>
         /// The hidden internal constructor
         /// </summary>
-        internal SignalFxReporterBuilder(MetricsReports reports, string apiToken, TimeSpan interval)
+        internal SignalFxReporterBuilder(string apiToken, TimeSpan interval)
         {
-            this.reports = reports;
             this.apiToken = apiToken;
             this.interval = interval;
         }
@@ -142,9 +142,67 @@ namespace Metrics.SignalFx
         /// Buidl the actual reporter
         /// </summary>
         /// <returns></returns>
-        public MetricsReports Build()
+        public Tuple<MetricsReport, TimeSpan> Build()
         {
-            return reports.WithReport(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), defaultSource, defaultDimensions, maxDatapointsPerMessage), interval);
+            return new Tuple<MetricsReport, TimeSpan>(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), defaultSource, defaultDimensions, maxDatapointsPerMessage), interval);
+        }
+
+        public static SignalFxReporterBuilder FromAppConfig()
+        {
+            try
+            {
+                SignalFxReporterConfiguration config = SignalFxReporterConfiguration.FromConfig();
+
+                if (config == null)
+                {
+                    return null;
+                }
+
+                IDictionary<string, string> defaultDimensions = new Dictionary<string, string>();
+                if (config.DefaultDimensions != null)
+                {
+                    foreach (DefaultDimension defaultDimension in config.DefaultDimensions)
+                    {
+                        defaultDimensions.Add(defaultDimension.Name, defaultDimension.Value);
+                    }
+                }
+                SignalFxReporterBuilder builder = new SignalFxReporterBuilder(config.APIToken, config.SampleInterval);
+                builder.WithBaseURI(config.BaseURI);
+                builder.WithMaxDatapointsPerMessage(config.MaxDatapointsPerMessage);
+                builder.WithDefaultDimensions(defaultDimensions);
+                if (config.AwsIntegration)
+                {
+                    builder.WithAWSInstanceIdDimension();
+                }
+                switch (config.SourceType)
+                {
+                    case SourceType.netbios:
+                        builder.WithNetBiosNameSource();
+                        break;
+                    case SourceType.dns:
+                        builder.WithDNSSource();
+                        break;
+                    case SourceType.fqdn:
+                        builder.WithFQDNSource();
+                        break;
+                    case SourceType.custom:
+                        if (!string.IsNullOrEmpty(config.SourceValue))
+                        {
+                            builder.WithSource(config.SourceValue);
+                            break;
+                        }
+                        throw new Exception("Metrics.SignalFx.Source.Value must be set if Metrics.SignalFx.Source.Type is \"source\".");
+                    default:
+                        throw new Exception("Metrics.SignalFx.Source.Type must be one of netbios, dns, fqdn, or source(with Metrics.SignalFx.Source.Value set)");
+                }
+                return builder;
+            }
+            catch (Exception x)
+            {
+                log.ErrorException("Metrics: Error configuring SignalFx reports", x);
+                throw new InvalidOperationException("Invalid Metrics Configuration: Metrics.SignalFx.APIToken must be non-empty and Metrics.SignalFx.Interval.Seconds must be an integer > 0", x);
+
+            }
         }
     }
 }
