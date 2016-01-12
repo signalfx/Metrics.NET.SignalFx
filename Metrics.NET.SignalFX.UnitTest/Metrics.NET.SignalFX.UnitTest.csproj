@@ -34,14 +34,20 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>keys.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Metrics">
+      <HintPath>..\packages\Metrics.NET.0.2.16\lib\net45\Metrics.dll</HintPath>
+    </Reference>
     <Reference Include="protobuf-net">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="Metrics">
-      <HintPath>..\packages\Metrics.NET.0.2.14\lib\net45\Metrics.dll</HintPath>
-    </Reference>
     <Reference Include="System.XML" />
     <Reference Include="xunit">
       <HintPath>..\packages\xunit.1.9.2\lib\net20\xunit.dll</HintPath>
@@ -71,6 +77,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="keys.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

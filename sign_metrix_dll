@@ -1,0 +1,7 @@
+#!/bin/bash 
+set -e
+set -x
+/c/Program\ Files\ \(x86\)/Microsoft\ SDKs/Windows/v8.1A/bin/NETFX\ 4.5.1\ Tools/ildasm.exe -all -out=packages/Metrics.NET.0.2.16/lib/net45/Metrics.il packages/Metrics.NET.0.2.16/lib/net45/Metrics.dll
+
+/c/Windows/Microsoft.NET/Framework/v4.0.30319/ilasm.exe -dll -key=keys.snk packages/Metrics.NET.0.2.16/lib/net45/Metrics.il
+
