@@ -14,7 +14,7 @@ namespace Metrics.NET.SignalFx.UnitTest.Fakes
 
         public byte[] WrittenData
         {
-            get { return _writeStream.GetBuffer(); }
+            get { return _writeStream.ToArray(); }
         }
 
         public string ResponseData { get; set; }

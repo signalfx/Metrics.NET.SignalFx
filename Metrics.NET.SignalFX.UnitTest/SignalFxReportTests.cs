@@ -7,6 +7,7 @@ using Metrics.Core;
 using Xunit;
 using Metrics.NET.SignalFx.UnitTest.Fakes;
 using Metrics.SignalFx;
+using Metrics.SignalFX;
 
 namespace Metrics.NET.SignalFx.UnitTest
 {
@@ -21,8 +22,8 @@ namespace Metrics.NET.SignalFx.UnitTest
                              sender,
                              "FakeApiKey",
                              new Dictionary<string, string> {
-                    { "System", "UnitTests" }
-                }, 10000);
+                    { "System", "UnitTests" },
+                }, 10000, new HashSet<MetricDetails> { MetricDetails.count });
 
             var accountNoRandom = new Random();
             // 
@@ -64,7 +65,7 @@ namespace Metrics.NET.SignalFx.UnitTest
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
-                }, 50);
+                }, 50, new HashSet<MetricDetails> { MetricDetails.count });
 
             var accountNoRandom = new Random();
             // 
@@ -105,7 +106,7 @@ namespace Metrics.NET.SignalFx.UnitTest
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
-                }, 10000);
+                }, 10000, null);
 
             var tags = new MetricTags("test=value");
 
@@ -205,7 +206,7 @@ namespace Metrics.NET.SignalFx.UnitTest
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
-                }, 10000);
+                }, 10000, new HashSet<MetricDetails> { MetricDetails.count });
 
             var tags = new MetricTags("test\\=string=test\\value");
 
@@ -235,7 +236,7 @@ namespace Metrics.NET.SignalFx.UnitTest
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
-                }, 10000);
+                }, 10000, new HashSet<MetricDetails> { MetricDetails.count });
 
             var tags = new MetricTags("test=string,noequal");
 

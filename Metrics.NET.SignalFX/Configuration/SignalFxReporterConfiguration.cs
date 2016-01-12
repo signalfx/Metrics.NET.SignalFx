@@ -68,5 +68,12 @@ namespace Metrics.SignalFx.Configuration
             get { return (DefaultDimensionConfigurationCollection)this["defaultDimensions"]; }
             set { this["defaultDimensions"] = value; }
         }
+
+        [ConfigurationProperty("metricDetails", DefaultValue="count,min,mean,min", IsRequired = false)]
+        public String MetricDetails
+        {
+            get { return (String)this["metricDetails"]; }
+            set { this["metricDetails"] = value; }
+        }
     }
 }

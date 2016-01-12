@@ -1,6 +1,7 @@
 ﻿using com.signalfuse.metrics.protobuf;
 using Metrics.MetricData;
 using Metrics.Reporters;
+using Metrics.SignalFX;
 using Metrics.Utils;
 using System;
 using System.Collections.Generic;
@@ -30,16 +31,18 @@ namespace Metrics.SignalFx
         private readonly String defaultSource;
         private readonly IDictionary<string, string> defaultDimensions;
         private readonly int maxDatapointsPerMessage;
+        private readonly ISet<MetricDetails> metricDetails;
         private DataPointUploadMessage uploadMessage;
         private int datapointsAdded = 0;
 
 
-        public SignalFxReport(ISignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions, int maxDatapointsPerMessage)
+        public SignalFxReport(ISignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions, int maxDatapointsPerMessage, ISet<MetricDetails> metricDetails)
         {
             this.sender = sender;
             this.defaultSource = defaultSource;
             this.defaultDimensions = defaultDimensions;
             this.maxDatapointsPerMessage = maxDatapointsPerMessage;
+            this.metricDetails = metricDetails;
         }
 
         protected override void StartReport(string contextName)
@@ -58,7 +61,7 @@ namespace Metrics.SignalFx
         {
             if (!double.IsNaN(value) && !double.IsInfinity(value))
             {
-                AddGauge(Name(name, unit), value, tags);
+                AddGauge(Name(name, unit), value, tags, null);
             }
         }
 
@@ -66,17 +69,17 @@ namespace Metrics.SignalFx
         {
             if (value.Items.Length == 0)
             {
-                AddCumulativeCounter(Name(name, unit), value.Count, tags);
+                AddCumulativeCounter(Name(name, unit), value.Count, tags, null);
             }
             else
             {
-                AddCumulativeCounter(SubfolderName(name, unit, "Total"), value.Count, tags);
+                AddCumulativeCounter(SubfolderName(name, unit, "Total"), value.Count, tags, null);
             }
 
             foreach (var item in value.Items)
             {
-                AddCumulativeCounter(SubfolderName(name, unit, item.Item), item.Count, tags);
-                AddGauge(SubfolderName(name, unit, item.Item, "Percent"), item.Percent, tags);
+                AddCumulativeCounter(SubfolderName(name, unit, item.Item), item.Count, tags, null);
+                AddGauge(SubfolderName(name, unit, item.Item, "Percent"), item.Percent, tags, MetricDetails.percent);
             }
         }
 
@@ -84,76 +87,90 @@ namespace Metrics.SignalFx
 
         protected override void ReportHistogram(string name, HistogramValue value, Unit unit, MetricTags tags)
         {
-            AddCumulativeCounter(SubfolderName(name, unit, "Count"), value.Count, tags);
-            AddGauge(SubfolderName(name, unit, "Last"), value.LastValue, tags);
-            AddGauge(SubfolderName(name, unit, "Min"), value.Min, tags);
-            AddGauge(SubfolderName(name, unit, "Mean"), value.Mean, tags);
-            AddGauge(SubfolderName(name, unit, "Max"), value.Max, tags);
-            AddGauge(SubfolderName(name, unit, "StdDev"), value.StdDev, tags);
-            AddGauge(SubfolderName(name, unit, "p75"), value.Median, tags);
-            AddGauge(SubfolderName(name, unit, "p95"), value.Percentile75, tags);
-            AddGauge(SubfolderName(name, unit, "p95"), value.Percentile95, tags);
-            AddGauge(SubfolderName(name, unit, "p98"), value.Percentile98, tags);
-            AddGauge(SubfolderName(name, unit, "p99"), value.Percentile99, tags);
-            AddGauge(SubfolderName(name, unit, "p999"), value.Percentile999, tags);
+            AddCumulativeCounter(SubfolderName(name, unit, "Count"), value.Count, tags, MetricDetails.count);
+            AddGauge(SubfolderName(name, unit, "Last"), value.LastValue, tags, MetricDetails.last);
+            AddGauge(SubfolderName(name, unit, "Min"), value.Min, tags, MetricDetails.min);
+            AddGauge(SubfolderName(name, unit, "Mean"), value.Mean, tags, MetricDetails.mean);
+            AddGauge(SubfolderName(name, unit, "Max"), value.Max, tags, MetricDetails.max);
+            AddGauge(SubfolderName(name, unit, "StdDev"), value.StdDev, tags, MetricDetails.stddev);
+            AddGauge(SubfolderName(name, unit, "Median"), value.Median, tags, MetricDetails.median);
+            AddGauge(SubfolderName(name, unit, "p75"), value.Percentile75, tags, MetricDetails.percent_75);
+            AddGauge(SubfolderName(name, unit, "p95"), value.Percentile95, tags, MetricDetails.percent_95);
+            AddGauge(SubfolderName(name, unit, "p98"), value.Percentile98, tags, MetricDetails.percent_98);
+            AddGauge(SubfolderName(name, unit, "p99"), value.Percentile99, tags, MetricDetails.percent_99);
+            AddGauge(SubfolderName(name, unit, "p999"), value.Percentile999, tags, MetricDetails.percent_999);
         }
 
         protected override void ReportMeter(string name, MeterValue value, Unit unit, TimeUnit rateUnit, MetricTags tags)
         {
-            AddCumulativeCounter(SubfolderName(name, unit, "Total"), value.Count, tags);
-            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-Mean"), value.MeanRate, tags);
-            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-1-min"), value.OneMinuteRate, tags);
-            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-5-min"), value.FiveMinuteRate, tags);
-            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-15-min"), value.FifteenMinuteRate, tags);
+            AddCumulativeCounter(SubfolderName(name, unit, "Total"), value.Count, tags, null);
+            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-Mean"), value.MeanRate, tags, MetricDetails.rate_mean);
+            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-1-min"), value.OneMinuteRate, tags, MetricDetails.rate_1min);
+            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-5-min"), value.FiveMinuteRate, tags, MetricDetails.rate_5min);
+            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-15-min"), value.FifteenMinuteRate, tags, MetricDetails.rate_15min);
 
             foreach (var item in value.Items)
             {
-                AddGauge(SubfolderName(name, unit, item.Item, "Percent"), item.Percent, tags);
-                AddCumulativeCounter(SubfolderName(name, unit, item.Item, "Count"), item.Value.Count, tags);
-                AddGauge(SubfolderName(name, AsRate(unit, rateUnit), item.Item, "Rate-Mean"), item.Value.MeanRate, tags);
-                AddGauge(SubfolderName(name, AsRate(unit, rateUnit), item.Item, "Rate-1-min"), item.Value.OneMinuteRate, tags);
-                AddGauge(SubfolderName(name, AsRate(unit, rateUnit), item.Item, "Rate-5-min"), item.Value.FiveMinuteRate, tags);
-                AddGauge(SubfolderName(name, AsRate(unit, rateUnit), item.Item, "Rate-15-min"), item.Value.FifteenMinuteRate, tags);
+                AddGauge(SubfolderName(name, unit, item.Item, "Percent"), item.Percent, tags, MetricDetails.percent);
+                AddCumulativeCounter(SubfolderName(name, unit, item.Item, "Count"), item.Value.Count, tags, MetricDetails.count);
+                AddGauge(SubfolderName(name, AsRate(unit, rateUnit), item.Item, "Rate-Mean"), item.Value.MeanRate, tags, MetricDetails.rate_mean);
+                AddGauge(SubfolderName(name, AsRate(unit, rateUnit), item.Item, "Rate-1-min"), item.Value.OneMinuteRate, tags, MetricDetails.rate_1min);
+                AddGauge(SubfolderName(name, AsRate(unit, rateUnit), item.Item, "Rate-5-min"), item.Value.FiveMinuteRate, tags, MetricDetails.rate_5min);
+                AddGauge(SubfolderName(name, AsRate(unit, rateUnit), item.Item, "Rate-15-min"), item.Value.FifteenMinuteRate, tags, MetricDetails.rate_15min);
             }
         }
 
         protected override void ReportTimer(string name, TimerValue value, Unit unit, TimeUnit rateUnit, TimeUnit durationUnit, MetricTags tags)
         {
-            AddCumulativeCounter(SubfolderName(name, unit, "Count"), value.Rate.Count, tags);
-            AddGauge(SubfolderName(name, unit, "Active_Sessions"), value.ActiveSessions, tags);
+            AddCumulativeCounter(SubfolderName(name, unit, "Count"), value.Rate.Count, tags, MetricDetails.count);
+            AddGauge(SubfolderName(name, unit, "Active_Sessions"), value.ActiveSessions, tags, MetricDetails.active_sessions);
 
-            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-Mean"), value.Rate.MeanRate, tags);
-            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-1-min"), value.Rate.OneMinuteRate, tags);
-            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-5-min"), value.Rate.FiveMinuteRate, tags);
-            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-15-min"), value.Rate.FifteenMinuteRate, tags);
+            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-Mean"), value.Rate.MeanRate, tags, MetricDetails.rate_mean);
+            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-1-min"), value.Rate.OneMinuteRate, tags, MetricDetails.rate_1min);
+            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-5-min"), value.Rate.FiveMinuteRate, tags, MetricDetails.rate_5min);
+            AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-15-min"), value.Rate.FifteenMinuteRate, tags, MetricDetails.rate_15min);
 
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Last"), value.Histogram.LastValue, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Min"), value.Histogram.Min, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Mean"), value.Histogram.Mean, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Max"), value.Histogram.Max, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-StdDev"), value.Histogram.StdDev, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p75"), value.Histogram.Median, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p95"), value.Histogram.Percentile75, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p95"), value.Histogram.Percentile95, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p98"), value.Histogram.Percentile98, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p99"), value.Histogram.Percentile99, tags);
-            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p999"), value.Histogram.Percentile999, tags);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Last"), value.Histogram.LastValue, tags, MetricDetails.last);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Min"), value.Histogram.Min, tags, MetricDetails.min);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Mean"), value.Histogram.Mean, tags, MetricDetails.mean);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Max"), value.Histogram.Max, tags, MetricDetails.max);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-StdDev"), value.Histogram.StdDev, tags, MetricDetails.stddev);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Median"), value.Histogram.Median, tags, MetricDetails.median);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p75"), value.Histogram.Percentile75, tags, MetricDetails.percent_75);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p95"), value.Histogram.Percentile95, tags, MetricDetails.percent_95);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p98"), value.Histogram.Percentile98, tags, MetricDetails.percent_98);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p99"), value.Histogram.Percentile99, tags, MetricDetails.percent_99);
+            AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-p999"), value.Histogram.Percentile999, tags, MetricDetails.percent_999);
 
         }
 
-        protected virtual void AddGauge(string name, double value, MetricTags tags)
+        protected virtual bool shouldSend(MetricDetails? metricDetails)
         {
-            Add(name, value, com.signalfuse.metrics.protobuf.MetricType.GAUGE, tags);
+            return this.metricDetails == null || metricDetails == null || this.metricDetails.Contains((MetricDetails)metricDetails);
         }
 
-        protected virtual void AddGauge(string name, long value, MetricTags tags)
+        protected virtual void AddGauge(string name, double value, MetricTags tags, MetricDetails? metricDetails)
         {
-            Add(name, value, com.signalfuse.metrics.protobuf.MetricType.GAUGE, tags);
+            if (shouldSend(metricDetails))
+            {
+                Add(name, value, com.signalfuse.metrics.protobuf.MetricType.GAUGE, tags);
+            }
         }
 
-        protected virtual void AddCumulativeCounter(string name, double value, MetricTags tags)
+        protected virtual void AddGauge(string name, long value, MetricTags tags, MetricDetails? metricDetails)
         {
-            Add(name, value, com.signalfuse.metrics.protobuf.MetricType.CUMULATIVE_COUNTER, tags);
+            if (shouldSend(metricDetails))
+            {
+                Add(name, value, com.signalfuse.metrics.protobuf.MetricType.GAUGE, tags);
+            }
+        }
+
+        protected virtual void AddCumulativeCounter(string name, double value, MetricTags tags, MetricDetails? metricDetails)
+        {
+            if (shouldSend(metricDetails))
+            {
+                Add(name, value, com.signalfuse.metrics.protobuf.MetricType.CUMULATIVE_COUNTER, tags);
+            }
         }
 
         protected virtual void Add(string name, double value, com.signalfuse.metrics.protobuf.MetricType metricType, MetricTags tags)

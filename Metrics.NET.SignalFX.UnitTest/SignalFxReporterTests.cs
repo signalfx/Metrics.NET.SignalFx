@@ -7,6 +7,7 @@ using Metrics.SignalFx;
 using Xunit;
 using ProtoBuf;
 using System.IO;
+using Metrics.SignalFX;
 
 namespace Metrics.NET.SignalFx.UnitTest
 {
@@ -24,7 +25,7 @@ namespace Metrics.NET.SignalFx.UnitTest
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
-                }, 10000);
+                }, 10000, new HashSet<MetricDetails> { MetricDetails.mean });
 
             var tags = new MetricTags("test\\=string=test\\value");
 
@@ -58,7 +59,7 @@ namespace Metrics.NET.SignalFx.UnitTest
                         "FakeApiKey",
                         new Dictionary<string, string> {
                     { "System", "UnitTests" }
-                }, 10000);
+                }, 10000, new HashSet<MetricDetails> { MetricDetails.count });
 
             int errorCount = 0;
             new MetricsConfig(context).WithErrorHandler((exc, msg) => errorCount++, true);
@@ -86,7 +87,7 @@ namespace Metrics.NET.SignalFx.UnitTest
                         "FakeApiKey",
                         new Dictionary<string, string> {
                     { "System", "UnitTests" }
-                }, 10000);
+                }, 10000, new HashSet<MetricDetails> { MetricDetails.count });
 
             int errorCount = 0;
             new MetricsConfig(context).WithErrorHandler((exc, msg) => errorCount++, true);

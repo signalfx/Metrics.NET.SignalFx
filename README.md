@@ -84,6 +84,26 @@ Metric.Config.WithReporting(report =>
      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithDefaultDimensions(defaultDims).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
 ```
 
+####Aggregations
+The Metrics.NET library calculates aggregations for almost all of the metric types:
+
+ - Counter(with items) -> percentage
+
+ - Histogram -> count, last, min, mean, max, stddev, median, percent_75, percent_95, percent_98, percent_99, percent_999
+
+ - Meter(no items) -> rate_mean, rate_1min, rate_5min, rate_15min
+ - Meter(with items) -> per Item: percent, rate_mean, rate_1min, rate_5min, rate_15min
+
+
+ - Timer -> count, active_sessions, rate_mean, rate_1min, rate_5min, rate_15min, last, min, mean, max, stddev, median, percent_75, percent_95, percent_98, percent_99, percent_999
+
+The client can specify which of these aggregations they wish to send. By default count,min,mean,max aggregations are sent.
+```csharp
+// Add default Dimensions
+Metric.Config.WithReporting(report =>
+     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithMetricDetail(MetricDetails.percent_99).Build());
+     ```
+
 ###App.Config Configuration
 It is also possible to use App.Config to configure the SignalFxReporter.
 

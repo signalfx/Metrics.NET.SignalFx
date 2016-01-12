@@ -3,6 +3,7 @@ using Metrics.Logging;
 using Metrics.Reporters;
 using Metrics.SignalFx.Configuration;
 using Metrics.SignalFx.Helpers;
+using Metrics.SignalFX;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,6 +26,7 @@ namespace Metrics.SignalFx
         private string baseURI = DEFAULT_URI;
         private int maxDatapointsPerMessage = MAX_DATAPOINTS_PER_MESSAGE;
         private string defaultSource;
+        private ISet<MetricDetails> metricDetails = new HashSet<MetricDetails>();
 
         /// <summary>
         /// The hidden internal constructor
@@ -139,12 +141,34 @@ namespace Metrics.SignalFx
         }
 
         /// <summary>
-        /// Buidl the actual reporter
+        /// Add a signel metric details to use 
+        /// </summary>
+        /// <param name="metricDetail">The metric detail to use</param>
+        /// <return>this</return>
+        public SignalFxReporterBuilder WithMetricDetail(MetricDetails metricDetail)
+        {
+            this.metricDetails.Add(metricDetail);
+            return this;
+        }
+
+        /// <summary>
+        /// Add metric details to use 
+        /// </summary>
+        /// <param name="metricDetails">The metric details to use</param>
+        /// <return>this</return>
+        public SignalFxReporterBuilder WithMetricDetails(IEnumerable<MetricDetails> metricDetaisl)
+        {
+            this.metricDetails.UnionWith(metricDetails);
+            return this;
+        }
+
+        /// <summary>
+        /// Build the actual reporter
         /// </summary>
         /// <returns></returns>
         public Tuple<MetricsReport, TimeSpan> Build()
         {
-            return new Tuple<MetricsReport, TimeSpan>(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), defaultSource, defaultDimensions, maxDatapointsPerMessage), interval);
+            return new Tuple<MetricsReport, TimeSpan>(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails), interval);
         }
 
         public static SignalFxReporterBuilder FromAppConfig()
@@ -170,6 +194,16 @@ namespace Metrics.SignalFx
                 builder.WithBaseURI(config.BaseURI);
                 builder.WithMaxDatapointsPerMessage(config.MaxDatapointsPerMessage);
                 builder.WithDefaultDimensions(defaultDimensions);
+                String metricDetailsStr = config.MetricDetails;
+                ISet<MetricDetails> metricDetails = new HashSet<MetricDetails>();
+                if (metricDetailsStr != null)
+                {
+                    string[] metricDetailStrs = metricDetailsStr.Split(',');
+                    foreach (string metricDetailStr in metricDetailStrs)
+                    {
+                        builder.WithMetricDetail((MetricDetails)Enum.Parse(typeof(MetricDetails),metricDetailStr));
+                    }
+                }
                 if (config.AwsIntegration)
                 {
                     builder.WithAWSInstanceIdDimension();
