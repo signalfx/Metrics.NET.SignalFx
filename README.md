@@ -99,7 +99,7 @@ The Metrics.NET library calculates aggregations for almost all of the metric typ
 
 The client can specify which of these aggregations they wish to send. By default count,min,mean,max aggregations are sent.
 ```csharp
-// Add default Dimensions
+// Send the 99 percentile metrics
 Metric.Config.WithReporting(report =>
      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithMetricDetail(MetricDetails.percent_99).Build());
      ```
