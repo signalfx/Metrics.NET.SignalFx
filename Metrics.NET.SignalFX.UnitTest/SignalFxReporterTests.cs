@@ -22,6 +22,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var sender = new SignalFxReporter("http://fake.signalfuse.com", "ABC123", requestor);
             var report = new SignalFxReport(
                              sender,
+                             "",
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
@@ -56,6 +57,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var sender = new SignalFxReporter("http://fake.signalfuse.com", "ABC123", requestor);
             var report = new SignalFxReport(
                         sender,
+                        "",
                         "FakeApiKey",
                         new Dictionary<string, string> {
                     { "System", "UnitTests" }
@@ -84,6 +86,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var sender = new SignalFxReporter("http://fake.signalfuse.com", "ABC123", requestor);
             var report = new SignalFxReport(
                         sender,
+                        "",
                         "FakeApiKey",
                         new Dictionary<string, string> {
                     { "System", "UnitTests" }

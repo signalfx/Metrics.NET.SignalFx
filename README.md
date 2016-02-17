@@ -127,13 +127,14 @@ top of your App.Config file.
 Next you need to add a <signalFxReporter> stanza
 You must specify the following attributes:
  - apiToken - Your SignalFx token
+
+The following attributes are optional
+ - sourceDimension - What the name of the "source" dimension is.
  - sourceType - How you would like to configure the default source. Your choices are:
   - netbios
   - dns
   - fqdn
   - custom - If you specify this you must also specify the "sourceValue" attribute to specify the custom source.
-
-The following attributes are optional
  - sampleInterval - TimeSpan (defaults to 00:00:05, mininum 00:00:01) How often to report metrics to SignalFx
  - maxDatapointPerMessage - Integer (defaults to 10000, min 1, max 10000) The maximumum of points to report per message
                             to SignalFx
@@ -142,6 +143,12 @@ E.g
 ```xml
   <signalFxReporter apiToken="AAABQWDCC" sourceType="netbios" sampleInterval="00:00:05"/> 
 ```
+
+### Source Value for a Metric
+It is often useful, but not required, to identify the "source" of a metric. An example of this is a hostname. There are two things
+that needs to be configured:
+  - sourceDimension - The name of the "source" metric.
+  - defaultSource - The value to send when the source metric value is not specified.
 
 ###Default Dimensions
 To add default dimensions add a nested <defaultDimensions> in your <signalFxReporter> stanza:

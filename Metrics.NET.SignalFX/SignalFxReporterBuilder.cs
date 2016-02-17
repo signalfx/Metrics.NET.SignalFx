@@ -25,7 +25,8 @@ namespace Metrics.SignalFx
         private IDictionary<string, string> defaultDimensions = new Dictionary<string, string>();
         private string baseURI = DEFAULT_URI;
         private int maxDatapointsPerMessage = MAX_DATAPOINTS_PER_MESSAGE;
-        private string defaultSource;
+        private string sourceDimension = "";
+        private string defaultSource = "";
         private ISet<MetricDetails> metricDetails = new HashSet<MetricDetails>();
 
         /// <summary>
@@ -163,12 +164,23 @@ namespace Metrics.SignalFx
         }
 
         /// <summary>
+        /// Set the name of the "source" dimension to use
+        /// </summary>
+        /// <param name="sourceDimension">The name of the source dimension</param>
+        /// <returns></returns>
+        public SignalFxReporterBuilder WithSourceDimension(String sourceDimension)
+        {
+            this.sourceDimension = sourceDimension;
+            return this;
+        }
+
+        /// <summary>
         /// Build the actual reporter
         /// </summary>
         /// <returns></returns>
         public Tuple<MetricsReport, TimeSpan> Build()
         {
-            return new Tuple<MetricsReport, TimeSpan>(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails), interval);
+            return new Tuple<MetricsReport, TimeSpan>(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), sourceDimension, defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails), interval);
         }
 
         public static SignalFxReporterBuilder FromAppConfig()
@@ -201,15 +213,27 @@ namespace Metrics.SignalFx
                     string[] metricDetailStrs = metricDetailsStr.Split(',');
                     foreach (string metricDetailStr in metricDetailStrs)
                     {
-                        builder.WithMetricDetail((MetricDetails)Enum.Parse(typeof(MetricDetails),metricDetailStr));
+                        builder.WithMetricDetail((MetricDetails)Enum.Parse(typeof(MetricDetails), metricDetailStr));
                     }
                 }
                 if (config.AwsIntegration)
                 {
                     builder.WithAWSInstanceIdDimension();
                 }
+                bool haveSourceDimension = (config.SourceDimension != null);
+                if (haveSourceDimension)
+                {
+                    builder.WithSourceDimension(config.SourceDimension);
+                }
+                else if (config.SourceType != SourceType.none)
+                {
+                    builder.WithSourceDimension("sf_source");
+                }
+
                 switch (config.SourceType)
                 {
+                    case SourceType.none:
+                        break;
                     case SourceType.netbios:
                         builder.WithNetBiosNameSource();
                         break;
@@ -229,6 +253,7 @@ namespace Metrics.SignalFx
                     default:
                         throw new Exception("Metrics.SignalFx.Source.Type must be one of netbios, dns, fqdn, or source(with Metrics.SignalFx.Source.Value set)");
                 }
+
                 return builder;
             }
             catch (Exception x)

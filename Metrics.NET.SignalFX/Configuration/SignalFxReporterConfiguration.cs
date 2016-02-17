@@ -25,7 +25,14 @@ namespace Metrics.SignalFx.Configuration
             set { this["sampleInterval"] = value; }
         }
 
-        [ConfigurationProperty("sourceType", IsRequired = true)]
+        [ConfigurationProperty("sourceDimension", IsRequired = false)]
+        public String SourceDimension
+        {
+            get { return (String)this["sourceDimension"]; }
+            set { this["sourceDimension"] = value; }
+        }
+
+        [ConfigurationProperty("sourceType", IsRequired = false, DefaultValue=SourceType.none)]
         public SourceType SourceType
         {
             get { return (SourceType)this["sourceType"]; }

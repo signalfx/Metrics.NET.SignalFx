@@ -20,6 +20,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var sender = new FakeSignalFxReporter();
             var report = new SignalFxReport(
                              sender,
+                             "",
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" },
@@ -62,6 +63,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var sender = new FakeSignalFxReporter();
             var report = new SignalFxReport(
                              sender,
+                             "",
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
@@ -103,6 +105,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var sender = new FakeSignalFxReporter();
             var report = new SignalFxReport(
                              sender,
+                             "",
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
@@ -203,6 +206,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var sender = new FakeSignalFxReporter();
             var report = new SignalFxReport(
                              sender,
+                             "",
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }
@@ -233,6 +237,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var sender = new FakeSignalFxReporter();
             var report = new SignalFxReport(
                              sender,
+                             "",
                              "FakeApiKey",
                              new Dictionary<string, string> {
                     { "System", "UnitTests" }

@@ -28,6 +28,7 @@ namespace Metrics.SignalFx
         private static readonly Regex slash = new Regex(@"\s*/\s*", RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
         private readonly ISignalFxReporter sender;
+        private readonly String sourceDimension;
         private readonly String defaultSource;
         private readonly IDictionary<string, string> defaultDimensions;
         private readonly int maxDatapointsPerMessage;
@@ -36,9 +37,10 @@ namespace Metrics.SignalFx
         private int datapointsAdded = 0;
 
 
-        public SignalFxReport(ISignalFxReporter sender, string defaultSource, IDictionary<string, string> defaultDimensions, int maxDatapointsPerMessage, ISet<MetricDetails> metricDetails)
+        public SignalFxReport(ISignalFxReporter sender, string sourceDimension, string defaultSource, IDictionary<string, string> defaultDimensions, int maxDatapointsPerMessage, ISet<MetricDetails> metricDetails)
         {
             this.sender = sender;
+            this.sourceDimension = sourceDimension;
             this.defaultSource = defaultSource;
             this.defaultDimensions = defaultDimensions;
             this.maxDatapointsPerMessage = maxDatapointsPerMessage;
@@ -197,8 +199,10 @@ namespace Metrics.SignalFx
             string sourceName = dimensions.ContainsKey(SOURCE_DIMENSION) ? dimensions[SOURCE_DIMENSION] : defaultSource;
             dataPoint.metric = metricName;
             dataPoint.metricType = metricType;
-            dataPoint.source = sourceName;
-            AddDimension(dataPoint, SF_SOURCE, sourceName);
+            if (!String.IsNullOrEmpty(sourceDimension) && !dimensions.ContainsKey(sourceDimension))
+            {
+                AddDimension(dataPoint, SF_SOURCE, sourceName);
+            }
 
             AddDimensions(dataPoint, defaultDimensions);
             AddDimensions(dataPoint, dimensions);
