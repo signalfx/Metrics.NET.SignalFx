@@ -1,6 +1,5 @@
 #Metrics.NET.SignalFX
 ## What is the SignalFX Reporter for Metrics.NET
-S
 The Metrics.NET library provides a way of instrumenting applications with custom metrics (timers, histograms, counters etc) that can be reported in various ways and can provide insights on what is happening inside a running application.
 
 This assembly provides a mechanism to report the metrics gathered by Metrics.NET to SignalFx.
@@ -102,7 +101,7 @@ The client can specify which of these aggregations they wish to send. By default
 // Send the 99 percentile metrics
 Metric.Config.WithReporting(report =>
      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithMetricDetail(MetricDetails.percent_99).Build());
-     ```
+```
 
 ###App.Config Configuration
 It is also possible to use App.Config to configure the SignalFxReporter.
