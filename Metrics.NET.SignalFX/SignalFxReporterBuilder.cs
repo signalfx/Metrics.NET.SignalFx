@@ -1,6 +1,7 @@
 ﻿
 using Metrics.Logging;
 using Metrics.Reporters;
+using Metrics.Reports;
 using Metrics.SignalFx.Configuration;
 using Metrics.SignalFx.Helpers;
 using Metrics.SignalFX;
@@ -20,6 +21,7 @@ namespace Metrics.SignalFx
         private static readonly int MAX_DATAPOINTS_PER_MESSAGE = 10000;
         private static readonly string INSTANCE_ID_DIMENSION = "InstanceId";
 
+        private MetricsReports reports;
         private string apiToken;
         private TimeSpan interval;
         private IDictionary<string, string> defaultDimensions = new Dictionary<string, string>();
@@ -32,8 +34,9 @@ namespace Metrics.SignalFx
         /// <summary>
         /// The hidden internal constructor
         /// </summary>
-        internal SignalFxReporterBuilder(string apiToken, TimeSpan interval)
+        internal SignalFxReporterBuilder(MetricsReports reports, string apiToken, TimeSpan interval)
         {
+            this.reports = reports;
             this.apiToken = apiToken;
             this.interval = interval;
         }
@@ -178,12 +181,12 @@ namespace Metrics.SignalFx
         /// Build the actual reporter
         /// </summary>
         /// <returns></returns>
-        public Tuple<MetricsReport, TimeSpan> Build()
+        public MetricsReports Build()
         {
-            return new Tuple<MetricsReport, TimeSpan>(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), sourceDimension, defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails), interval);
+            return reports.WithReport(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), sourceDimension, defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails), interval);
         }
 
-        public static SignalFxReporterBuilder FromAppConfig()
+        public static SignalFxReporterBuilder FromAppConfig(MetricsReports reports)
         {
             try
             {
@@ -202,7 +205,7 @@ namespace Metrics.SignalFx
                         defaultDimensions.Add(defaultDimension.Name, defaultDimension.Value);
                     }
                 }
-                SignalFxReporterBuilder builder = new SignalFxReporterBuilder(config.APIToken, config.SampleInterval);
+                SignalFxReporterBuilder builder = new SignalFxReporterBuilder(reports, config.APIToken, config.SampleInterval);
                 builder.WithBaseURI(config.BaseURI);
                 builder.WithMaxDatapointsPerMessage(config.MaxDatapointsPerMessage);
                 builder.WithDefaultDimensions(defaultDimensions);
