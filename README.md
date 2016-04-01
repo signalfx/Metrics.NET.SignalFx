@@ -15,12 +15,28 @@ public MetricContext getContext() {
 
 //Setup counters for API usage
 public void setupCounters(string env) {
-    this,loginAPICount = getContext().Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
+    this.loginAPICount = getContext().Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
     this.purchaseAPICount = getContext().Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
 }
 ```
 This will create a context called "app" so metrics reported will look like "yourhostname.app.api.use".
 This will allow you to see all of of your api.use metrics together or split it out by environment or by api_type.
+
+##Incremental Counters
+By default Metrics.Net counters are cumulative counters (i.e they send every increasing values 0,2,10,20,30). However some use cases
+it is better to have a distributed counter where only deltas are sent. E.g if you are measuring something across servers and the information about the server that is doing the measuring is not important. To get a Counter that only sends deltas, use TaggedMetricsContext.IncrementalCounter.
+
+```csharp
+public MetricContext getContext() {
+   MetricsContext context = Metric.Context("app", (ctxName) => { return new TaggedMetricsContext(ctxName); });
+}
+
+//Setup counters for API usage
+public void setupCounters(string env) {
+    this.loginAPICount = ((TaggedMetricContext)getContext()).IncrementalCounter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
+    this.purchaseAPICount = ((TaggedMetricContext)getContext()).IncrementalCounter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
+}
+```
 
 ##Configuring the SignalFxReporter
 To configure Metrics.Net to report you need to set up two things
