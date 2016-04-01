@@ -2,6 +2,7 @@
 using Metrics.MetricData;
 using Metrics.Reporters;
 using Metrics.SignalFX;
+using Metrics.SignalFX.Extensions;
 using Metrics.Utils;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,12 @@ namespace Metrics.SignalFx
 
         protected override void ReportCounter(string name, CounterValue value, Unit unit, MetricTags tags)
         {
+            if (name.Contains(IncrementalCounter.INC_COUNTER_PREFIX))
+            {
+                name = name.Remove(name.IndexOf(IncrementalCounter.INC_COUNTER_PREFIX), IncrementalCounter.INC_COUNTER_PREFIX.Length);
+                AddCounter(Name(name, unit), value.Count, tags, null);
+                return;
+            }
             if (value.Items.Length == 0)
             {
                 AddCumulativeCounter(Name(name, unit), value.Count, tags, null);
@@ -172,6 +179,14 @@ namespace Metrics.SignalFx
             if (shouldSend(metricDetails))
             {
                 Add(name, value, com.signalfuse.metrics.protobuf.MetricType.CUMULATIVE_COUNTER, tags);
+            }
+        }
+
+        protected virtual void AddCounter(string name, double value, MetricTags tags, MetricDetails? metricDetails)
+        {
+            if (shouldSend(metricDetails))
+            {
+                Add(name, value, com.signalfuse.metrics.protobuf.MetricType.COUNTER, tags);
             }
         }
 

@@ -60,6 +60,7 @@
     <Compile Include="Configuration\DefaultDimensionConfigurationCollection.cs" />
     <Compile Include="Configuration\SignalFxReporterConfiguration.cs" />
     <Compile Include="Configuration\SourceType.cs" />
+    <Compile Include="Extensions\IncrementalCounter.cs" />
     <Compile Include="Helpers\IWebRequestor.cs" />
     <Compile Include="Helpers\IWebRequestorFactory.cs" />
     <Compile Include="Helpers\WebRequestor.cs" />
