@@ -191,7 +191,7 @@ namespace Metrics.SignalFx
             return new SignalFxReport(new SignalFxReporter(baseURI, apiToken), sourceDimension, defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails);
         }
 
-        public Tuple<MetricsReport, TimeSpan> toBuilderInterval()
+        public Tuple<MetricsReport, TimeSpan> toReporterInterval()
         {
             return new Tuple<MetricsReport, TimeSpan>(toReport(), interval);
         }
