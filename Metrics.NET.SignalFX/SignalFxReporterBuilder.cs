@@ -183,7 +183,17 @@ namespace Metrics.SignalFx
         /// <returns></returns>
         public MetricsReports Build()
         {
-            return reports.WithReport(new SignalFxReport(new SignalFxReporter(baseURI, apiToken), sourceDimension, defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails), interval);
+            return reports.WithReport(toReport(), interval);
+        }
+
+        private SignalFxReport toReport()
+        {
+            return new SignalFxReport(new SignalFxReporter(baseURI, apiToken), sourceDimension, defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails);
+        }
+
+        public Tuple<MetricsReport, TimeSpan> toBuilderInterval()
+        {
+            return new Tuple<MetricsReport, TimeSpan>(toReport(), interval);
         }
 
         public static SignalFxReporterBuilder FromAppConfig(MetricsReports reports)
