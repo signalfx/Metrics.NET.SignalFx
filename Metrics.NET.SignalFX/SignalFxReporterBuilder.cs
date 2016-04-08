@@ -196,6 +196,12 @@ namespace Metrics.SignalFx
             return new Tuple<MetricsReport, TimeSpan>(toReport(), interval);
         }
 
+        public static  Tuple<MetricsReport, TimeSpan> FromAppConfig()
+        {
+            return FromAppConfig(null).toReporterInterval();
+        }
+
+
         public static SignalFxReporterBuilder FromAppConfig(MetricsReports reports)
         {
             try
