@@ -239,7 +239,7 @@ namespace Metrics.SignalFx
                 {
                     builder.WithAWSInstanceIdDimension();
                 }
-                bool haveSourceDimension = (config.SourceDimension != null);
+                bool haveSourceDimension = !String.IsNullOrEmpty(config.SourceDimension);
                 if (haveSourceDimension)
                 {
                     builder.WithSourceDimension(config.SourceDimension);
