@@ -216,7 +216,7 @@ namespace Metrics.SignalFx
             dataPoint.metricType = metricType;
             if (!String.IsNullOrEmpty(sourceDimension) && !dimensions.ContainsKey(sourceDimension))
             {
-                AddDimension(dataPoint, SF_SOURCE, sourceName);
+                AddDimension(dataPoint, sourceDimension, sourceName);
             }
 
             AddDimensions(dataPoint, defaultDimensions);
