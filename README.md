@@ -1,5 +1,5 @@
-#Metrics.NET.SignalFX
-## What is the SignalFX Reporter for Metrics.NET
+#Metrics.NET.SignalFx
+## What is the SignalFx Reporter for Metrics.NET
 The Metrics.NET library provides a way of instrumenting applications with custom metrics (timers, histograms, counters etc) that can be reported in various ways and can provide insights on what is happening inside a running application.
 
 This assembly provides a mechanism to report the metrics gathered by Metrics.NET to SignalFx.
@@ -40,11 +40,11 @@ public void setupCounters(string env) {
 
 ##Configuring the SignalFxReporter
 To configure Metrics.Net to report you need to set up two things
- - Your SignalFX API token
+ - Your SignalFx API token
  - The default source
 
-###Your SignalFX API Token
-Your API SignalFX API token is available if you click on your avatar in the SignalFx UI.
+###Your SignalFx API Token
+Your API SignalFx API token is available if you click on your avatar in the SignalFx UI.
 
 ###Default source name
 When reporting to SignalFx we need to associate the reported metrics to a "source". Some choices are:
@@ -54,10 +54,10 @@ When reporting to SignalFx we need to associate the reported metrics to a "sourc
  - Custom Source
 
 ###AWS Integration
-If your code will be running on an AWS instance and you have integrated SignalFx with AWS. You can configure the Metrics.Net.SignalFX reporter to send the instance id as one of the dimensions so that you can use the discovered AWS instance attributes to filter and group metrics.
+If your code will be running on an AWS instance and you have integrated SignalFx with AWS. You can configure the Metrics.Net.SignalFx reporter to send the instance id as one of the dimensions so that you can use the discovered AWS instance attributes to filter and group metrics.
 
 ###Default Dimensions
-If there are dimeensions that you wish to send on all the metrics that you report to SignalFx. You can configure a set of "default dimensions" when you configure the SignalFXReporter
+If there are dimensions that you wish to send on all the metrics that you report to SignalFx. You can configure a set of "default dimensions" when you configure the SignalFxReporter
 
 ###C# Configuration
 ####Basic Configuration
@@ -150,8 +150,8 @@ The following attributes are optional
   - dns
   - fqdn
   - custom - If you specify this you must also specify the "sourceValue" attribute to specify the custom source.
- - sampleInterval - TimeSpan (defaults to 00:00:05, mininum 00:00:01) How often to report metrics to SignalFx
- - maxDatapointPerMessage - Integer (defaults to 10000, min 1, max 10000) The maximumum of points to report per message
+ - sampleInterval - TimeSpan (defaults to 00:00:05, minimum 00:00:01) How often to report metrics to SignalFx
+ - maxDatapointPerMessage - Integer (defaults to 10000, min 1, max 10000) The maximum of points to report per message
                             to SignalFx
  - awsIntegration - Boolean (default to false) If set to true then the AWS integration will be turned on. 
 E.g
