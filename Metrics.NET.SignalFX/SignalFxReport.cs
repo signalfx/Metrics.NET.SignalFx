@@ -1,4 +1,5 @@
 ﻿using com.signalfuse.metrics.protobuf;
+using Metrics.Core;
 using Metrics.MetricData;
 using Metrics.Reporters;
 using Metrics.SignalFX;
@@ -34,6 +35,8 @@ namespace Metrics.SignalFx
         private readonly IDictionary<string, string> defaultDimensions;
         private readonly int maxDatapointsPerMessage;
         private readonly ISet<MetricDetails> metricDetails;
+
+        private readonly Dictionary<string, long> distributedMetrics = new Dictionary<string, long>();
         private DataPointUploadMessage uploadMessage;
         private int datapointsAdded = 0;
 
@@ -76,13 +79,29 @@ namespace Metrics.SignalFx
                 AddCounter(Name(name, unit), value.Count, tags, null);
                 return;
             }
+
+            long count = value.Count;
+            if (name.Contains(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX))
+            {
+                string taggedName = "counter:" + TaggedMetricsRegistry.TagName(name, tags);
+                if (distributedMetrics.ContainsKey(taggedName))
+                {
+                    if (distributedMetrics[taggedName] == count)
+                    {
+                        return;
+                    }
+                }
+                distributedMetrics[taggedName] = count;
+                name = name.Remove(name.IndexOf(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX), TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX.Length);
+            }
+
             if (value.Items.Length == 0)
             {
-                AddCumulativeCounter(Name(name, unit), value.Count, tags, null);
+                AddCumulativeCounter(Name(name, unit), count, tags, null);
             }
             else
             {
-                AddCumulativeCounter(SubfolderName(name, unit, "Total"), value.Count, tags, null);
+                AddCumulativeCounter(SubfolderName(name, unit, "Total"), count, tags, null);
             }
 
             foreach (var item in value.Items)
@@ -96,7 +115,22 @@ namespace Metrics.SignalFx
 
         protected override void ReportHistogram(string name, HistogramValue value, Unit unit, MetricTags tags)
         {
-            AddCumulativeCounter(SubfolderName(name, unit, "Count"), value.Count, tags, MetricDetails.count);
+            long count = value.Count;
+            if (name.Contains(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX))
+            {
+                string taggedName = "histogram:" + TaggedMetricsRegistry.TagName(name, tags);
+                if (distributedMetrics.ContainsKey(taggedName))
+                {
+                    if (distributedMetrics[taggedName] == count)
+                    {
+                        return;
+                    }
+                }
+                distributedMetrics[taggedName] = count;
+                name = name.Remove(name.IndexOf(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX), TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX.Length);
+            }
+
+            AddCumulativeCounter(SubfolderName(name, unit, "Count"), count, tags, MetricDetails.count);
             AddGauge(SubfolderName(name, unit, "Last"), value.LastValue, tags, MetricDetails.last);
             AddGauge(SubfolderName(name, unit, "Min"), value.Min, tags, MetricDetails.min);
             AddGauge(SubfolderName(name, unit, "Mean"), value.Mean, tags, MetricDetails.mean);
@@ -112,7 +146,21 @@ namespace Metrics.SignalFx
 
         protected override void ReportMeter(string name, MeterValue value, Unit unit, TimeUnit rateUnit, MetricTags tags)
         {
-            AddCumulativeCounter(SubfolderName(name, unit, "Total"), value.Count, tags, null);
+            long count = value.Count;
+            if (name.Contains(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX))
+            {
+                string taggedName = "meter:" + TaggedMetricsRegistry.TagName(name, tags);
+                if (distributedMetrics.ContainsKey(taggedName))
+                {
+                    if (distributedMetrics[taggedName] == count)
+                    {
+                        return;
+                    }
+                }
+                distributedMetrics[taggedName] = count;
+                name = name.Remove(name.IndexOf(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX), TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX.Length);
+            }
+            AddCumulativeCounter(SubfolderName(name, unit, "Total"), count, tags, null);
             AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-Mean"), value.MeanRate, tags, MetricDetails.rate_mean);
             AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-1-min"), value.OneMinuteRate, tags, MetricDetails.rate_1min);
             AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-5-min"), value.FiveMinuteRate, tags, MetricDetails.rate_5min);
@@ -131,7 +179,21 @@ namespace Metrics.SignalFx
 
         protected override void ReportTimer(string name, TimerValue value, Unit unit, TimeUnit rateUnit, TimeUnit durationUnit, MetricTags tags)
         {
-            AddCumulativeCounter(SubfolderName(name, unit, "Count"), value.Rate.Count, tags, MetricDetails.count);
+            long count = value.Rate.Count;
+            if (name.Contains(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX))
+            {
+                string taggedName = "timer:" + TaggedMetricsRegistry.TagName(name, tags);
+                if (distributedMetrics.ContainsKey(taggedName))
+                {
+                    if (distributedMetrics[taggedName] == count)
+                    {
+                        return;
+                    }
+                }
+                distributedMetrics[taggedName] = count;
+                name = name.Remove(name.IndexOf(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX), TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX.Length);
+            }
+            AddCumulativeCounter(SubfolderName(name, unit, "Count"), count, tags, MetricDetails.count);
             AddGauge(SubfolderName(name, unit, "Active_Sessions"), value.ActiveSessions, tags, MetricDetails.active_sessions);
 
             AddGauge(SubfolderName(name, AsRate(unit, rateUnit), "Rate-Mean"), value.Rate.MeanRate, tags, MetricDetails.rate_mean);

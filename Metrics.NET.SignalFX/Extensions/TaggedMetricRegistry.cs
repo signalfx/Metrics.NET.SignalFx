@@ -8,8 +8,11 @@ namespace Metrics.Core
 {
     public sealed class TaggedMetricsRegistry : MetricsRegistry
     {
+
+        public static readonly string REPORT_ON_UPDATE_PREFIX = "aaasignalfxreportonupadteprefixaaa";
+
         private class MetricMetaCatalog<TMetric, TValue, TMetricValue>
-            where TValue : MetricValueSource<TMetricValue>
+        where TValue : MetricValueSource<TMetricValue>
         {
             public class MetricMeta
             {
@@ -130,7 +133,7 @@ namespace Metrics.Core
             });
         }
 
-        private string TagName(string name, MetricTags? tags)
+        public static string TagName(string name, MetricTags? tags)
         {
             if (!tags.HasValue)
             {
