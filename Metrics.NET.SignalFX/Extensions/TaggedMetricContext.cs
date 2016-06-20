@@ -27,7 +27,7 @@ namespace Metrics.Core
         /// <summary>
         /// Creates a timer that will only report iff at least one sample has been added since the last time a report was sent.
         /// </summary>
-        /// <see cref="MetricsContext.Timer"/>
+        /// <see cref="MetricsContext.Counter"/>
         public Counter ReportOnUpdateCounter(string name, Unit unit, MetricTags tags = default(MetricTags))
         {
             return Counter(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX + name, unit, tags);
@@ -43,6 +43,18 @@ namespace Metrics.Core
             MetricTags tags = default(MetricTags))
         {
             return Timer(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX + name, unit, samplingType, rateUnit, durationUnit, tags);
+        }
+
+        /// <summary>
+        /// Creates a timer that will only report an incremental counter for the rate and mean.
+        /// </summary>
+        /// <see cref="MetricsContext.Timer"/>
+        public Timer IncrementalTimer(string name, Unit unit,
+            SamplingType samplingType = SamplingType.FavourRecent,
+            TimeUnit rateUnit = TimeUnit.Seconds, TimeUnit durationUnit = TimeUnit.Milliseconds,
+            MetricTags tags = default(MetricTags))
+        {
+            return Timer(TaggedMetricsRegistry.INCREMENTAL_PREFIX + name, unit, samplingType, rateUnit, durationUnit, tags);
         }
 
         /// <summary>

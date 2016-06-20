@@ -10,6 +10,7 @@ namespace Metrics.Core
     {
 
         public static readonly string REPORT_ON_UPDATE_PREFIX = "aaasignalfxreportonupadteprefixaaa";
+        public static readonly string INCREMENTAL_PREFIX = "aaasignalfxincrementalaaa";
 
         private class MetricMetaCatalog<TMetric, TValue, TMetricValue>
         where TValue : MetricValueSource<TMetricValue>

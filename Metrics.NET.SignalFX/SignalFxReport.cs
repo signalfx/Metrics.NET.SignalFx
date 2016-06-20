@@ -36,7 +36,8 @@ namespace Metrics.SignalFx
         private readonly int maxDatapointsPerMessage;
         private readonly ISet<MetricDetails> metricDetails;
 
-        private readonly Dictionary<string, long> distributedMetrics = new Dictionary<string, long>();
+        private readonly Dictionary<string, long> reportOnUpdate = new Dictionary<string, long>();
+        private readonly Dictionary<string, long> incrementalMetrics = new Dictionary<string, long>();
         private DataPointUploadMessage uploadMessage;
         private int datapointsAdded = 0;
 
@@ -84,14 +85,14 @@ namespace Metrics.SignalFx
             if (name.Contains(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX))
             {
                 string taggedName = "counter:" + TaggedMetricsRegistry.TagName(name, tags);
-                if (distributedMetrics.ContainsKey(taggedName))
+                if (reportOnUpdate.ContainsKey(taggedName))
                 {
-                    if (distributedMetrics[taggedName] == count)
+                    if (reportOnUpdate[taggedName] == count)
                     {
                         return;
                     }
                 }
-                distributedMetrics[taggedName] = count;
+                reportOnUpdate[taggedName] = count;
                 name = name.Remove(name.IndexOf(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX), TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX.Length);
             }
 
@@ -119,14 +120,14 @@ namespace Metrics.SignalFx
             if (name.Contains(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX))
             {
                 string taggedName = "histogram:" + TaggedMetricsRegistry.TagName(name, tags);
-                if (distributedMetrics.ContainsKey(taggedName))
+                if (reportOnUpdate.ContainsKey(taggedName))
                 {
-                    if (distributedMetrics[taggedName] == count)
+                    if (reportOnUpdate[taggedName] == count)
                     {
                         return;
                     }
                 }
-                distributedMetrics[taggedName] = count;
+                reportOnUpdate[taggedName] = count;
                 name = name.Remove(name.IndexOf(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX), TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX.Length);
             }
 
@@ -150,14 +151,14 @@ namespace Metrics.SignalFx
             if (name.Contains(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX))
             {
                 string taggedName = "meter:" + TaggedMetricsRegistry.TagName(name, tags);
-                if (distributedMetrics.ContainsKey(taggedName))
+                if (reportOnUpdate.ContainsKey(taggedName))
                 {
-                    if (distributedMetrics[taggedName] == count)
+                    if (reportOnUpdate[taggedName] == count)
                     {
                         return;
                     }
                 }
-                distributedMetrics[taggedName] = count;
+                reportOnUpdate[taggedName] = count;
                 name = name.Remove(name.IndexOf(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX), TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX.Length);
             }
             AddCumulativeCounter(SubfolderName(name, unit, "Total"), count, tags, null);
@@ -180,19 +181,36 @@ namespace Metrics.SignalFx
         protected override void ReportTimer(string name, TimerValue value, Unit unit, TimeUnit rateUnit, TimeUnit durationUnit, MetricTags tags)
         {
             long count = value.Rate.Count;
+
+            if (name.Contains(TaggedMetricsRegistry.INCREMENTAL_PREFIX))
+            {
+                string taggedName = "timer:" + TaggedMetricsRegistry.TagName(name, tags);
+                var reportCount = count;
+                if (incrementalMetrics.ContainsKey(taggedName))
+                {
+                    reportCount = count - incrementalMetrics[taggedName];
+                }
+                incrementalMetrics[taggedName] = count;
+                name = name.Remove(name.IndexOf(TaggedMetricsRegistry.INCREMENTAL_PREFIX), TaggedMetricsRegistry.INCREMENTAL_PREFIX.Length);
+                AddCounter(SubfolderName(name, unit, "Count"), reportCount, tags, MetricDetails.count);
+                AddGauge(SubfolderName(name, durationUnit.Unit(), "Duration-Mean"), value.Histogram.Mean, tags, MetricDetails.mean);
+                return;
+            }
+
             if (name.Contains(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX))
             {
                 string taggedName = "timer:" + TaggedMetricsRegistry.TagName(name, tags);
-                if (distributedMetrics.ContainsKey(taggedName))
+                if (reportOnUpdate.ContainsKey(taggedName))
                 {
-                    if (distributedMetrics[taggedName] == count)
+                    if (reportOnUpdate[taggedName] == count)
                     {
                         return;
                     }
                 }
-                distributedMetrics[taggedName] = count;
+                reportOnUpdate[taggedName] = count;
                 name = name.Remove(name.IndexOf(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX), TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX.Length);
             }
+
             AddCumulativeCounter(SubfolderName(name, unit, "Count"), count, tags, MetricDetails.count);
             AddGauge(SubfolderName(name, unit, "Active_Sessions"), value.ActiveSessions, tags, MetricDetails.active_sessions);
 
