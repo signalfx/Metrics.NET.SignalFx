@@ -117,7 +117,7 @@ top of your App.Config file.
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
   <configSections>
-    <section name="signalFxReporter" type=" Metrics.SignalFx.Configuration.SignalFxReporterConfiguration, Metrics.NET.SignalFx"/>
+    <section name="signalFxReporter" type="Metrics.SignalFx.Configuration.SignalFxReporterConfiguration, Metrics.NET.SignalFx"/>
   </configSsections>
   ....
 </configuration>
@@ -190,8 +190,8 @@ public TaggedMetricContext getContext() {
 
 //Setup counters for API usage
 public void setupCounters(string env) {
-    this.loginAPTime = getContext().IncrementalTimer("api.time", tags: new MetricTags("environment="+env, "api_type=login"));
-    this.purchaseAPITime= getContext().IncrementalCounter("api.time", tags: new MetricTags("environment="+env, "api_type=purchase"));
+    this.loginAPTime = getContext().IncrementalTimer("api", Unit.Requests, tags: new MetricTags("environment="+env, "api_type=login"));
+    this.purchaseAPITime= getContext().IncrementalTimer("api", Unit.Requests, tags: new MetricTags("environment="+env, "api_type=purchase"));
 }
 ```
 
@@ -204,3 +204,25 @@ designed for these use cases:
   * TaggedMetricsContext.ReportOnUpdateHistogram
 All of these metrics act exactly the same as the underlying type, however they only report data points to SignalFx when a sample has been added. 
   
+```csharp
+public TaggedMetricContext getContext() {
+   return (TaggedMetricsContext)Metric.Context("app", (ctxName) => { return new TaggedMetricsContext(ctxName); });
+}
+
+private Counter getCustomerCounter(string customerId) {
+   return getContext().ReportOnUpdateCounter("api.use", Unit.Calls, new MetricTags("customerId="+customerId));
+}
+private Timer getCustomerAPITimer(string customerId, string api) {
+   return getContext().ReportOnUpdateTimer("api.time", Unit.Requests, new MetricTags("api="+api, "customerId="+customerId));
+}
+
+public void purchaseAPI(String item, String userId, String customerId, double price) {
+    getCustomerCounter(customerId).inc();
+    using (var context = getCustomerAPITimer(customerId, "purchase"))
+    {
+        processPurchase(item, userId, customerId, price);
+
+        // if needed elapsed time is available in context.Elapsed 
+    }
+}
+```
