@@ -1,5 +1,6 @@
 ﻿using Metrics.SignalFX.Extensions;
 using Metrics.Utils;
+using System;
 
 namespace Metrics.Core
 {
@@ -12,6 +13,38 @@ namespace Metrics.Core
         public TaggedMetricsContext(string context)
             : base(context, new TaggedMetricsRegistry(), new DefaultMetricsBuilder(), () => Clock.Default.UTCDateTime)
         { }
+
+
+        public Counter Counter(string name, Unit unit, MetricTags tags = default(MetricTags))
+        {
+            return base.Counter(name, unit, tags);
+        }
+
+        public void Gauge(string name, Func<double> valueProvider, Unit unit, MetricTags tags = default(MetricTags))
+        {
+            base.Gauge(name, valueProvider, unit, tags);
+        }
+
+        public Histogram Histogram(string name, Unit unit, SamplingType samplingType = SamplingType.FavourRecent, MetricTags tags = default(MetricTags))
+        {
+            return base.Histogram(name, unit, samplingType, tags);
+        }
+
+
+        public Meter Meter(string name, Unit unit, TimeUnit rateUnit = TimeUnit.Seconds, MetricTags tags = default(MetricTags))
+        {
+            return base.Meter(name, unit, rateUnit, tags);
+        }
+
+        public void PerformanceCounter(string name, string counterCategory, string counterName, string counterInstance, Unit unit, MetricTags tags = default(MetricTags))
+        {
+            base.PerformanceCounter(name, counterCategory, counterName, counterInstance, unit, tags);
+        }
+
+        public Timer Timer(string name, Unit unit, SamplingType samplingType = SamplingType.FavourRecent, TimeUnit rateUnit = TimeUnit.Seconds, TimeUnit durationUnit = TimeUnit.Milliseconds, MetricTags tags = default(MetricTags))
+        {
+            return base.Timer(name, unit, samplingType, rateUnit, durationUnit, tags);
+        }
 
         /// <summary>
         /// Creates a counter that will report the difference in counts between reporting periods instead of the total count. This
