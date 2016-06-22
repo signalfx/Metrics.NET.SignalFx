@@ -73,8 +73,8 @@
     <Compile Include="SignalFxReporter.cs" />
     <Compile Include="SignalFxReport.cs" />
     <Compile Include="SignalFxReporterBuilder.cs" />
-    <Compile Include="Extensions\TaggedMetricContext.cs" />
-    <Compile Include="Extensions\TaggedMetricRegistry.cs" />
+    <Compile Include="Extensions\TaggedMetricsContext.cs" />
+    <Compile Include="Extensions\TaggedMetricsRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="keys.snk" />
