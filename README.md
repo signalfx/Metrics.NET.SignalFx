@@ -9,8 +9,8 @@ In order to send dimensions to SignalFx with Metrics.NET you use the MetricTags 
 
 ```csharp
 
-public MetricContext getContext() {
-   MetricsContext context = Metric.Context("app", (ctxName) => { return new TaggedMetricsContext(ctxName); });
+public TaggedMetricsContext getContext() {
+   return (TaggedMetricsContext)Metric.Context("app", (ctxName) => { return new TaggedMetricsContext(ctxName); });
 }
 
 //Setup counters for API usage
@@ -21,22 +21,6 @@ public void setupCounters(string env) {
 ```
 This will create a context called "app" so metrics reported will look like "yourhostname.app.api.use".
 This will allow you to see all of of your api.use metrics together or split it out by environment or by api_type.
-
-##Incremental Counters
-By default Metrics.Net counters are cumulative counters (i.e they send every increasing values 0,2,10,20,30). However some use cases
-it is better to have a distributed counter where only deltas are sent. E.g if you are measuring something across servers and the information about the server that is doing the measuring is not important. To get a Counter that only sends deltas, use TaggedMetricsContext.IncrementalCounter.
-
-```csharp
-public MetricContext getContext() {
-   MetricsContext context = Metric.Context("app", (ctxName) => { return new TaggedMetricsContext(ctxName); });
-}
-
-//Setup counters for API usage
-public void setupCounters(string env) {
-    this.loginAPICount = ((TaggedMetricContext)getContext()).IncrementalCounter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
-    this.purchaseAPICount = ((TaggedMetricContext)getContext()).IncrementalCounter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
-}
-```
 
 ##Configuring the SignalFxReporter
 To configure Metrics.Net to report you need to set up two things
@@ -175,3 +159,48 @@ To add default dimensions add a nested <defaultDimensions> in your <signalFxRepo
     </defaultDimensions>
   </signalFxReporter>
 ```
+
+## Additional Metrics
+Metrics.NET is designed for measuring for continuously generated metrics and reporting these metrics from unique sources.
+This does not fit all use cases. For example, sometimes the "where" something was counted doesn't matter, or something may not be measured continuously. In order to support these use cases Metrics.NET.SignalFx supports some additional metric types
+
+###Incremental Metrics
+Sometimes the "where" something is measured is not important, or it might be measured across several servers and need to be grouped by some other dimension (i.e. a customer id). In order for SignalFx to properly account for these types of metrics the following metric types should be used:
+
+####Counter
+By default Metrics.Net counters are cumulative counters (i.e they send every increasing values 0,2,10,20,30). To get a Counter that only sends deltas, use TaggedMetricsContext.IncrementalCounter.
+
+```csharp
+public TaggedMetricContext getContext() {
+   return (TaggedMetricsContext)Metric.Context("app", (ctxName) => { return new TaggedMetricsContext(ctxName); });
+}
+
+//Setup counters for API usage
+public void setupCounters(string env) {
+    this.loginAPICount = getContext().IncrementalCounter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
+    this.purchaseAPICount = getContext().IncrementalCounter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
+}
+```
+####Timer
+This timer records just like a regular Timer, but it just reports a delta count and an average of samples. These are the only values that are useful in a distributed situation. To get a Timer that only sends deltas, use TaggedMetricsContext.IncrementalTimer.
+```csharp
+public TaggedMetricContext getContext() {
+   return (TaggedMetricsContext)Metric.Context("app", (ctxName) => { return new TaggedMetricsContext(ctxName); });
+}
+
+//Setup counters for API usage
+public void setupCounters(string env) {
+    this.loginAPTime = getContext().IncrementalTimer("api.time", tags: new MetricTags("environment="+env, "api_type=login"));
+    this.purchaseAPITime= getContext().IncrementalCounter("api.time", tags: new MetricTags("environment="+env, "api_type=purchase"));
+}
+```
+
+###Non Continuous Metrics
+Metrics.NET was designed for continously measurable metrics, however not all metrics fit this profile. If you are recording timings per customer the rate at which a particular customer hits maybe low. The ReportOnUpdate\* metrics are
+designed for these use cases:
+  * TaggedMetricsContext.ReportOnUpdateCounter
+  * TaggedMetricsContext.ReportOnUpdateTimer
+  * TaggedMetricsContext.ReportOnUpdateMeter
+  * TaggedMetricsContext.ReportOnUpdateHistogram
+All of these metrics act exactly the same as the underlying type, however they only report data points to SignalFx when a sample has been added. 
+  
