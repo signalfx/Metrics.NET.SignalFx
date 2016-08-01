@@ -29,6 +29,7 @@ namespace Metrics.SignalFx
         private int maxDatapointsPerMessage = MAX_DATAPOINTS_PER_MESSAGE;
         private string sourceDimension = "";
         private string defaultSource = "";
+        private ISet<MetricDetails> defaultMetricDetails = new HashSet<MetricDetails>();
         private ISet<MetricDetails> metricDetails = new HashSet<MetricDetails>();
 
         /// <summary>
@@ -39,6 +40,10 @@ namespace Metrics.SignalFx
             this.reports = reports;
             this.apiToken = apiToken;
             this.interval = interval;
+            this.defaultMetricDetails.Add(MetricDetails.count);
+            this.defaultMetricDetails.Add(MetricDetails.min);
+            this.defaultMetricDetails.Add(MetricDetails.mean);
+            this.defaultMetricDetails.Add(MetricDetails.max);
         }
 
         /// <summary>
@@ -160,7 +165,7 @@ namespace Metrics.SignalFx
         /// </summary>
         /// <param name="metricDetails">The metric details to use</param>
         /// <return>this</return>
-        public SignalFxReporterBuilder WithMetricDetails(IEnumerable<MetricDetails> metricDetaisl)
+        public SignalFxReporterBuilder WithMetricDetails(IEnumerable<MetricDetails> metricDetails)
         {
             this.metricDetails.UnionWith(metricDetails);
             return this;
@@ -188,7 +193,16 @@ namespace Metrics.SignalFx
 
         private SignalFxReport toReport()
         {
-            return new SignalFxReport(new SignalFxReporter(baseURI, apiToken), sourceDimension, defaultSource, defaultDimensions, maxDatapointsPerMessage, this.metricDetails);
+            ISet<MetricDetails> toUseDetails;
+            if (this.metricDetails.Count > 0)
+            {
+                toUseDetails = this.metricDetails;
+            }
+            else
+            {
+                toUseDetails = this.defaultMetricDetails;
+            }
+            return new SignalFxReport(new SignalFxReporter(baseURI, apiToken), sourceDimension, defaultSource, defaultDimensions, maxDatapointsPerMessage, toUseDetails);
         }
 
         public Tuple<MetricsReport, TimeSpan> toReporterInterval()
@@ -196,7 +210,7 @@ namespace Metrics.SignalFx
             return new Tuple<MetricsReport, TimeSpan>(toReport(), interval);
         }
 
-        public static  Tuple<MetricsReport, TimeSpan> FromAppConfig()
+        public static Tuple<MetricsReport, TimeSpan> FromAppConfig()
         {
             return FromAppConfig(null).toReporterInterval();
         }

@@ -76,7 +76,7 @@ namespace Metrics.SignalFx.Configuration
             set { this["defaultDimensions"] = value; }
         }
 
-        [ConfigurationProperty("metricDetails", DefaultValue="count,min,mean,min", IsRequired = false)]
+        [ConfigurationProperty("metricDetails", DefaultValue="count,min,mean,max", IsRequired = false)]
         public String MetricDetails
         {
             get { return (String)this["metricDetails"]; }

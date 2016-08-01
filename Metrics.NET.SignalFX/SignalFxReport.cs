@@ -235,7 +235,7 @@ namespace Metrics.SignalFx
 
         protected virtual bool shouldSend(MetricDetails? metricDetails)
         {
-            return this.metricDetails == null || metricDetails == null || this.metricDetails.Contains((MetricDetails)metricDetails);
+            return this.metricDetails == null || this.metricDetails.Count == 0 || metricDetails == null || this.metricDetails.Contains((MetricDetails)metricDetails);
         }
 
         protected virtual void AddGauge(string name, double value, MetricTags tags, MetricDetails? metricDetails)
