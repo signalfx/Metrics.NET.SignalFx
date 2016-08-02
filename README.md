@@ -18,6 +18,11 @@ public void setupCounters(string env) {
     this.loginAPICount = getContext().Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
     this.purchaseAPICount = getContext().Counter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
 }
+....
+public void login() {
+    this.loginAPICount.Increment();
+    ....
+}
 ```
 This will create a context called "app" so metrics reported will look like "yourhostname.app.api.use".
 This will allow you to see all of of your api.use metrics together or split it out by environment or by api_type.
@@ -180,6 +185,11 @@ public void setupCounters(string env) {
     this.loginAPICount = getContext().IncrementalCounter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=login"));
     this.purchaseAPICount = getContext().IncrementalCounter("api.use", Unit.Calls, new MetricTags("environment="+env, "api_type=purchase"));
 }
+....
+public void login() {
+    this.loginAPICount.Increment();
+    ....
+}
 ```
 ####Timer
 This timer records just like a regular Timer, but it just reports a delta count and an average of samples. These are the only values that are useful in a distributed situation. To get a Timer that only sends deltas, use TaggedMetricsContext.IncrementalTimer.
@@ -192,6 +202,15 @@ public TaggedMetricContext getContext() {
 public void setupCounters(string env) {
     this.loginAPTime = getContext().IncrementalTimer("api", Unit.Requests, tags: new MetricTags("environment="+env, "api_type=login"));
     this.purchaseAPITime= getContext().IncrementalTimer("api", Unit.Requests, tags: new MetricTags("environment="+env, "api_type=purchase"));
+}
+....
+public void login() {
+   using (var context = this.loginAPITime(customerId, "purchase")).NewContext())
+    {
+        processLogin()
+        .....
+        // if needed elapsed time is available in context.Elapsed 
+    }
 }
 ```
 
@@ -218,10 +237,10 @@ private Timer getCustomerAPITimer(string customerId, string api) {
 
 public void purchaseAPI(String item, String userId, String customerId, double price) {
     getCustomerCounter(customerId).inc();
-    using (var context = getCustomerAPITimer(customerId, "purchase"))
+    using (var context = getCustomerAPITimer(customerId, "purchase").NewContext())
     {
         processPurchase(item, userId, customerId, price);
-
+        .....
         // if needed elapsed time is available in context.Elapsed 
     }
 }
