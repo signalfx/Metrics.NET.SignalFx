@@ -28,6 +28,10 @@ This will create a context called "app" so metrics reported will look like "your
 This will allow you to see all of of your api.use metrics together or split it out by environment or by api_type.
 
 ##Configuring the SignalFxReporter
+
+**You only need to configure the SignalFxReporter once per application start.**
+If you configure multiple reports they will each send any metrics registered with Metrics.NET. So if you call the Metrics.Config.WithReporting(...) 10 times, then each metric will be reported 10 times to SignalFx.
+
 To configure Metrics.Net to report you need to set up two things
  - Your SignalFx API token
  - The default source
