@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SignalFx Inc")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright (C) 2015 SignalFx, Inc.")]
+[assembly: AssemblyCopyright("Copyright (C) 2016 SignalFx, Inc.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("2.4.2.0")]
+[assembly: AssemblyVersion("2.5.0.0")]
 [assembly: InternalsVisibleTo("Metrics.NET.SignalFx.UnitTest" )]
