@@ -18,7 +18,7 @@ namespace Metrics.SignalFx
         private static readonly char[] EQUAL_SPLIT_CHARS = new char[] { '=' };
         private static readonly string METRIC_DIMENSION = "metric";
         private static readonly string SOURCE_DIMENSION = "source";
-        private static readonly string SF_SOURCE = "sf_source";
+        
         private static readonly HashSet<string> IGNORE_DIMENSIONS = new HashSet<string>();
         static SignalFxReport()
         {

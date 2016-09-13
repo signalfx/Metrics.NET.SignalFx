@@ -20,7 +20,12 @@ namespace Metrics.SignalFx
         private static readonly string DEFAULT_URI = "https://ingest.signalfx.com";
         private static readonly int MAX_DATAPOINTS_PER_MESSAGE = 10000;
         private static readonly string INSTANCE_ID_DIMENSION = "InstanceId";
+        private static readonly string HOST_DIMENSION = "host";
 
+        // 'sf_source' was the legacy default host dimension for Windows prior to version 2.5.0.0
+        // of Metrics.NET.SignalFx.dll. Preserve it here in case it's needed by someone.
+        private static readonly string LEGACY_HOST_DIMENSION = "sf_source";
+        
         private MetricsReports reports;
         private string apiToken;
         private TimeSpan interval;
@@ -260,7 +265,7 @@ namespace Metrics.SignalFx
                 }
                 else if (config.SourceType != SourceType.none)
                 {
-                    builder.WithSourceDimension("sf_source");
+                    builder.WithSourceDimension(HOST_DIMENSION);
                 }
 
                 switch (config.SourceType)
