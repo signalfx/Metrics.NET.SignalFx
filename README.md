@@ -161,7 +161,7 @@ that needs to be configured:
 ###Default Dimensions
 To add default dimensions add a nested <defaultDimensions> in your <signalFxReporter> stanza:
 ```xml
-  <signalFxReporter apiToken="AAABQWDCC" sourceType="netbios" sampleInterval="00:00:05"/> 
+  <signalFxReporter apiToken="AAABQWDCC" sourceType="netbios" sampleInterval="00:00:05"> 
     <defaultDimensions>
       <defaultDimension name="environment" value="prod"/>
       <defaultDimension name="serverType" value="API"/>
