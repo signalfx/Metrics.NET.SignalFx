@@ -45,6 +45,7 @@ When reporting to SignalFx we need to associate the reported metrics to a "sourc
  - DNS Name
  - FQDN
  - Custom Source
+ - None (don't send any "source" information)
 
 ###AWS Integration
 If your code will be running on an AWS instance and you have integrated SignalFx with AWS. You can configure the Metrics.Net.SignalFx reporter to send the instance id as one of the dimensions so that you can use the discovered AWS instance attributes to filter and group metrics.
@@ -127,7 +128,7 @@ top of your App.Config file.
 <configuration>
   <configSections>
     <section name="signalFxReporter" type="Metrics.SignalFx.Configuration.SignalFxReporterConfiguration, Metrics.NET.SignalFx"/>
-  </configSsections>
+  </configSections>
   ....
 </configuration>
 ```
@@ -137,8 +138,9 @@ You must specify the following attributes:
  - apiToken - Your SignalFx token
 
 The following attributes are optional
- - sourceDimension - What the name of the "source" dimension is.
+ - sourceDimension - What the name of the "source" dimension is. (If just a sourceType is specified and it is not 'none' then the default value for this is sf_source)
  - sourceType - How you would like to configure the default source. Your choices are:
+  - none
   - netbios
   - dns
   - fqdn
