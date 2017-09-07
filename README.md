@@ -1,4 +1,4 @@
-#Metrics.NET.SignalFx
+# Metrics.NET.SignalFx
 ## What is the SignalFx Reporter for Metrics.NET
 The Metrics.NET library provides a way of instrumenting applications with custom metrics (timers, histograms, counters etc) that can be reported in various ways and can provide insights on what is happening inside a running application.
 
