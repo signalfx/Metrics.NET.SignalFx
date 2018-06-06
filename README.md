@@ -4,7 +4,10 @@ The Metrics.NET library provides a way of instrumenting applications with custom
 
 This assembly provides a mechanism to report the metrics gathered by Metrics.NET to SignalFx.
 
-## Sending Dimensions
+Note: Versions 3.0.0 and above now target `.NET Standard 2.0`.
+
+##Sending Dimensions
+
 In order to send dimensions to SignalFx with Metrics.NET you use the MetricTags object and use Metrics.Core.TaggedMetricsContext. This unfortunately(currently) means that you will to have a second context (think . in metric name). MetricTags are currently a list of strings. To send a dimension just add a string that looks like "key=value" to the MetricTags object you use to initialize your metrics. E.g
 
 ```csharp
