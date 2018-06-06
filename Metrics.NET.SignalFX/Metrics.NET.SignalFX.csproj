@@ -1,91 +1,37 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{734125D8-6D99-4AF6-AFCD-9836DF09A1F2}</ProjectGuid>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>Metrics.NET.SignalFX</Title>
+    <PackageId>Metrics.NET.SignalFX</PackageId>
     <OutputType>Library</OutputType>
-    <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>Metrics.NET.SignalFX</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Version>3.0.0</Version>
+    <Authors>SignalFx</Authors>
+    <Company>SignalFx</Company>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>Metrics.SignalFX</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>keys.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="..\packages\Metrics.NET.0.2.16\lib\net45\Metrics.dll">
+      <PackagePath>lib\netstandard2.0\</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Include="..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll">
+      <PackagePath>lib\netstandard2.0</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="Metrics, Version=0.2.16.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Metrics.NET.0.2.16\lib\net45\Metrics.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="protobuf-net">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\DefaultDimension.cs" />
-    <Compile Include="Configuration\DefaultDimensionConfigurationCollection.cs" />
-    <Compile Include="Configuration\SignalFxReporterConfiguration.cs" />
-    <Compile Include="Configuration\SourceType.cs" />
-    <Compile Include="Extensions\IncrementalCounter.cs" />
-    <Compile Include="Helpers\IWebRequestor.cs" />
-    <Compile Include="Helpers\IWebRequestorFactory.cs" />
-    <Compile Include="Helpers\WebRequestor.cs" />
-    <Compile Include="Helpers\WebRequestorFactory.cs" />
-    <Compile Include="ISignalFxReporter.cs" />
-    <Compile Include="MetricDetails.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SignalFuseProtocolBuffers.cs" />
-    <Compile Include="SignalFxExtensions.cs" />
-    <Compile Include="SignalFxReporter.cs" />
-    <Compile Include="SignalFxReport.cs" />
-    <Compile Include="SignalFxReporterBuilder.cs" />
-    <Compile Include="Extensions\TaggedMetricsContext.cs" />
-    <Compile Include="Extensions\TaggedMetricsRegistry.cs" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="keys.snk" />
-    <None Include="packages.config" />
-    <None Include="signal_fuse_protocol_buffers.proto" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
-  <ProjectExtensions>
-    <VisualStudio AllowExistingFolder="true" />
-  </ProjectExtensions>
-  <PropertyGroup>
-    <PreBuildEvent>cd $(ProjectDir) &amp;&amp; powershell -Command if (!(Test-Path SignalFuseProtocolBuffers.cs) -or (Get-Item signal_fuse_protocol_buffers.proto).LastWriteTimeUtc -gt (Get-Item  SignalFuseProtocolBuffers.cs).LastWriteTimeUtc) {$(ProjectDir)\..\protobuf-net\bin\protogen -i:signal_fuse_protocol_buffers.proto  -o:SignalFuseProtocolBuffers.cs -p:detectMissing }</PreBuildEvent>
-  </PropertyGroup>
 </Project>
-
