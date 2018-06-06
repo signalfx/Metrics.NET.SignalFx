@@ -1,4 +1,4 @@
-#Metrics.NET.SignalFx
+# Metrics.NET.SignalFx
 ## What is the SignalFx Reporter for Metrics.NET
 The Metrics.NET library provides a way of instrumenting applications with custom metrics (timers, histograms, counters etc) that can be reported in various ways and can provide insights on what is happening inside a running application.
 
@@ -7,6 +7,7 @@ This assembly provides a mechanism to report the metrics gathered by Metrics.NET
 Note: Versions 3.0.0 and above now target `.NET Standard 2.0`.
 
 ##Sending Dimensions
+
 In order to send dimensions to SignalFx with Metrics.NET you use the MetricTags object and use Metrics.Core.TaggedMetricsContext. This unfortunately(currently) means that you will to have a second context (think . in metric name). MetricTags are currently a list of strings. To send a dimension just add a string that looks like "key=value" to the MetricTags object you use to initialize your metrics. E.g
 
 ```csharp
@@ -29,7 +30,7 @@ public void login() {
 This will create a context called "app" so metrics reported will look like "yourhostname.app.api.use".
 This will allow you to see all of of your api.use metrics together or split it out by environment or by api_type.
 
-##Configuring the SignalFxReporter
+## Configuring the SignalFxReporter
 
 **You only need to configure the SignalFxReporter once per application start.**
 If you configure multiple reports they will each send any metrics registered with Metrics.NET. So if you call the Metrics.Config.WithReporting(...) 10 times, then each metric will be reported 10 times to SignalFx.
@@ -38,10 +39,10 @@ To configure Metrics.Net to report you need to set up two things
  - Your SignalFx API token
  - The default source
 
-###Your SignalFx API Token
+### Your SignalFx API Token
 Your API SignalFx API token is available if you click on your avatar in the SignalFx UI.
 
-###Default source name
+### Default source name
 When reporting to SignalFx we need to associate the reported metrics to a "source". Some choices are:
  - NetBIOS Name
  - DNS Name
@@ -49,14 +50,14 @@ When reporting to SignalFx we need to associate the reported metrics to a "sourc
  - Custom Source
  - None (don't send any "source" information)
 
-###AWS Integration
+### AWS Integration
 If your code will be running on an AWS instance and you have integrated SignalFx with AWS. You can configure the Metrics.Net.SignalFx reporter to send the instance id as one of the dimensions so that you can use the discovered AWS instance attributes to filter and group metrics.
 
-###Default Dimensions
+### Default Dimensions
 If there are dimensions that you wish to send on all the metrics that you report to SignalFx. You can configure a set of "default dimensions" when you configure the SignalFxReporter
 
-###C# Configuration
-####Basic Configuration
+### C# Configuration
+#### Basic Configuration
 ```csharp
 // Configure with NetBios Name as the default source
  Metric.Config.WithReporting(report => 
@@ -78,14 +79,14 @@ Metric.Config.WithReporting(report =>
      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithSource("<source name>").Build());
 ```
 
-####AWS Integration
+#### AWS Integration
 ```csharp
 // Add AWS Integration
 Metric.Config.WithReporting(report =>
      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
 ```
 
-####Default Dimensions
+#### Default Dimensions
 ```csharp
 // Add default Dimensions
 IDictionary<string, string> defaultDims = new Dictionary<string, string>();
@@ -95,7 +96,7 @@ Metric.Config.WithReporting(report =>
      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithDefaultDimensions(defaultDims).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
 ```
 
-####Aggregations
+#### Aggregations
 The Metrics.NET library calculates aggregations for almost all of the metric types:
 
  - Counter(with items) -> percentage
@@ -115,14 +116,14 @@ Metric.Config.WithReporting(report =>
      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithMetricDetail(MetricDetails.percent_99).Build());
 ```
 
-###App.Config Configuration
+### App.Config Configuration
 It is also possible to use App.Config to configure the SignalFxReporter.
 
 To configure via App.Config use the following code to initialize your Metrics:
 ```csharp
 Metric.Config.WithReporting(report => report.WithSignalFxFromAppConfig());
 ```
-####Basic Configuration
+#### Basic Configuration
 You need to first setup a section in the <configSections> portion at the
 top of your App.Config file. 
 ```xml
@@ -162,7 +163,7 @@ that needs to be configured:
   - sourceDimension - The name of the "source" metric.
   - defaultSource - The value to send when the source metric value is not specified.
 
-###Default Dimensions
+### Default Dimensions
 To add default dimensions add a nested <defaultDimensions> in your <signalFxReporter> stanza:
 ```xml
   <signalFxReporter apiToken="AAABQWDCC" sourceType="netbios" sampleInterval="00:00:05"> 
@@ -177,10 +178,10 @@ To add default dimensions add a nested <defaultDimensions> in your <signalFxRepo
 Metrics.NET is designed for measuring for continuously generated metrics and reporting these metrics from unique sources.
 This does not fit all use cases. For example, sometimes the "where" something was counted doesn't matter, or something may not be measured continuously. In order to support these use cases Metrics.NET.SignalFx supports some additional metric types
 
-###Incremental Metrics
+### Incremental Metrics
 Sometimes the "where" something is measured is not important, or it might be measured across several servers and need to be grouped by some other dimension (i.e. a customer id). In order for SignalFx to properly account for these types of metrics the following metric types should be used:
 
-####Counter
+#### Counter
 By default Metrics.Net counters are cumulative counters (i.e they send every increasing values 0,2,10,20,30). To get a Counter that only sends deltas, use TaggedMetricsContext.IncrementalCounter.
 
 ```csharp
@@ -199,7 +200,7 @@ public void login() {
     ....
 }
 ```
-####Timer
+#### Timer
 This timer records just like a regular Timer, but it just reports a delta count and an average of samples. These are the only values that are useful in a distributed situation. To get a Timer that only sends deltas, use TaggedMetricsContext.IncrementalTimer.
 ```csharp
 public TaggedMetricContext getContext() {
@@ -222,7 +223,7 @@ public void login() {
 }
 ```
 
-###Non Continuous Metrics
+### Non Continuous Metrics
 Metrics.NET was designed for continously measurable metrics, however not all metrics fit this profile. If you are recording timings per customer the rate at which a particular customer hits maybe low. The ReportOnUpdate\* metrics are
 designed for these use cases:
   * TaggedMetricsContext.ReportOnUpdateCounter
