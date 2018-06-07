@@ -4,7 +4,7 @@ The Metrics.NET library provides a way of instrumenting applications with custom
 
 This assembly provides a mechanism to report the metrics gathered by Metrics.NET to SignalFx.
 
-Note: Versions 3.0.0 and above now target `.NET Standard 2.0`.
+Note: Versions 3.0.0 and above of this library now target `.NET Standard 2.0`.
 
 ## Sending Dimensions
 
