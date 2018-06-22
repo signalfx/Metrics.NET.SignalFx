@@ -4,7 +4,7 @@
     <Title>Metrics.NET.SignalFX</Title>
     <PackageId>Metrics.NET.SignalFX</PackageId>
     <OutputType>Library</OutputType>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <Authors>SignalFx</Authors>
     <Company>SignalFx</Company>
   </PropertyGroup>
@@ -12,20 +12,12 @@
     <RootNamespace>Metrics.SignalFX</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\packages\Metrics.NET.0.2.16\lib\net45\Metrics.dll">
-      <PackagePath>lib\netstandard2.0\</PackagePath>
-      <Pack>true</Pack>
-    </Content>
     <Content Include="..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll">
       <PackagePath>lib\netstandard2.0</PackagePath>
       <Pack>true</Pack>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Metrics, Version=0.2.16.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Metrics.NET.0.2.16\lib\net45\Metrics.dll</HintPath>
-    </Reference>
     <Reference Include="protobuf-net">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
@@ -33,5 +25,7 @@
   <ItemGroup>
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Metrics.NET" Version="0.5.5" />
+    <PackageReference Include="ConcurrencyUtils" Version="0.1.4" />
   </ItemGroup>
 </Project>

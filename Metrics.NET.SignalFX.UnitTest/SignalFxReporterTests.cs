@@ -30,7 +30,7 @@ namespace Metrics.NET.SignalFx.UnitTest
 
             var tags = new MetricTags("test\\=string=test\\value");
 
-            var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
+			var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.ExponentiallyDecaying, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
             timer.Record(10053, TimeUnit.Microseconds);
 
             var source = new CancellationTokenSource();
@@ -68,7 +68,7 @@ namespace Metrics.NET.SignalFx.UnitTest
 
             var tags = new MetricTags("test\\=string=test\\value");
 
-            var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
+			var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.ExponentiallyDecaying, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
             timer.Record(10053, TimeUnit.Microseconds);
 
             var source = new CancellationTokenSource();
@@ -97,7 +97,7 @@ namespace Metrics.NET.SignalFx.UnitTest
 
             var tags = new MetricTags("test\\=string=test\\value");
 
-            var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
+			var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.ExponentiallyDecaying, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
             timer.Record(10053, TimeUnit.Microseconds);
 
             var source = new CancellationTokenSource();
