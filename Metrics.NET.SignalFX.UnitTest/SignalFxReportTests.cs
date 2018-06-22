@@ -114,7 +114,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             var tags = new MetricTags("test=value");
 
             var totalExpectedMetrics = 0;
-            var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
+			var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.ExponentiallyDecaying, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
             timer.Record(10053, TimeUnit.Microseconds);
 
             // A single Timer produces 17 metrics
@@ -150,7 +150,7 @@ namespace Metrics.NET.SignalFx.UnitTest
             // and for each of the two, there is a total and a percentage
             totalExpectedMetrics += 5;
 
-            var histogram = context.Histogram("TestHistogram", Unit.Events, SamplingType.FavourRecent, tags);
+			var histogram = context.Histogram("TestHistogram", Unit.Events, SamplingType.ExponentiallyDecaying, tags);
             histogram.Update(23, "ABC");
             histogram.Update(14, "DEF");
 
@@ -214,7 +214,7 @@ namespace Metrics.NET.SignalFx.UnitTest
 
             var tags = new MetricTags("test\\=string=test\\value");
 
-            var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
+			var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.ExponentiallyDecaying, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
             timer.Record(10053, TimeUnit.Microseconds);
 
             var source = new CancellationTokenSource();
@@ -245,7 +245,7 @@ namespace Metrics.NET.SignalFx.UnitTest
 
             var tags = new MetricTags("test=string,noequal");
 
-            var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.FavourRecent, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
+			var timer = context.Timer("TestTimer", Unit.Calls, SamplingType.ExponentiallyDecaying, TimeUnit.Microseconds, TimeUnit.Microseconds, tags);
             timer.Record(10053, TimeUnit.Microseconds);
 
             var source = new CancellationTokenSource();

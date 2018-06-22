@@ -25,7 +25,7 @@ namespace Metrics.Core
             base.Gauge(name, valueProvider, unit, tags);
         }
 
-        public Histogram Histogram(string name, Unit unit, SamplingType samplingType = SamplingType.FavourRecent, MetricTags tags = default(MetricTags))
+		public Histogram Histogram(string name, Unit unit, SamplingType samplingType = SamplingType.ExponentiallyDecaying, MetricTags tags = default(MetricTags))
         {
             return base.Histogram(name, unit, samplingType, tags);
         }
@@ -41,7 +41,7 @@ namespace Metrics.Core
             base.PerformanceCounter(name, counterCategory, counterName, counterInstance, unit, tags);
         }
 
-        public Timer Timer(string name, Unit unit, SamplingType samplingType = SamplingType.FavourRecent, TimeUnit rateUnit = TimeUnit.Seconds, TimeUnit durationUnit = TimeUnit.Milliseconds, MetricTags tags = default(MetricTags))
+		public Timer Timer(string name, Unit unit, SamplingType samplingType = SamplingType.ExponentiallyDecaying, TimeUnit rateUnit = TimeUnit.Seconds, TimeUnit durationUnit = TimeUnit.Milliseconds, MetricTags tags = default(MetricTags))
         {
             return base.Timer(name, unit, samplingType, rateUnit, durationUnit, tags);
         }
@@ -71,7 +71,7 @@ namespace Metrics.Core
         /// </summary>
         /// <see cref="MetricsContext.Timer"/>
         public Timer ReportOnUpdateTimer(string name, Unit unit,
-            SamplingType samplingType = SamplingType.FavourRecent,
+		                                 SamplingType samplingType = SamplingType.ExponentiallyDecaying,
             TimeUnit rateUnit = TimeUnit.Seconds, TimeUnit durationUnit = TimeUnit.Milliseconds,
             MetricTags tags = default(MetricTags))
         {
@@ -83,7 +83,7 @@ namespace Metrics.Core
         /// </summary>
         /// <see cref="MetricsContext.Timer"/>
         public Timer IncrementalTimer(string name, Unit unit,
-            SamplingType samplingType = SamplingType.FavourRecent,
+		                              SamplingType samplingType = SamplingType.ExponentiallyDecaying,
             TimeUnit rateUnit = TimeUnit.Seconds, TimeUnit durationUnit = TimeUnit.Milliseconds,
             MetricTags tags = default(MetricTags))
         {
@@ -103,7 +103,7 @@ namespace Metrics.Core
         /// Creates a histogram that will only report iff at least one sample has been added since the last time a report was sent.
         /// </summary>
         /// <see cref="MetricsContext.Histogram"/>
-        public Histogram ReportOnUpdateHistogram(string name, Unit unit, SamplingType samplingType = SamplingType.FavourRecent, MetricTags tags = default(MetricTags))
+		public Histogram ReportOnUpdateHistogram(string name, Unit unit, SamplingType samplingType = SamplingType.ExponentiallyDecaying, MetricTags tags = default(MetricTags))
         {
             return Histogram(TaggedMetricsRegistry.REPORT_ON_UPDATE_PREFIX + name, unit, samplingType, tags);
         }
