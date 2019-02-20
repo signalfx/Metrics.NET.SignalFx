@@ -39,8 +39,23 @@ To configure Metrics.Net to report you need to set up two things
  - Your SignalFx API token
  - The default source
 
-### Your SignalFx API Token
-Your API SignalFx API token is available if you click on your avatar in the SignalFx UI.
+### Your SignalFx Organization Token
+Retrieve an access token from the Organization Settings > Access Tokens page in SignalFx.
+If there are multiple tokens and you are unsure which one to use, contact your SignalFx administrator.
+
+### Configuring your endpoint
+Before we can send metrics to SignalFx, we need to make sure you are sending them to
+the correct SignalFx realm. To determine what realm you are in, check your
+profile page in the SignalFx web application (click the avatar in the upper right and click My Profile).
+If you are not in the `us0` realm, you will need to add your realm to your endpoint, as shown below.
+
+```csharp
+// If your SignalFx profile page shows a realm other than us0,
+// configure the builder to include your realm in the endpoint
+ string ingestEndpoint = "https://ingest.{REALM}.signalfx.com";
+ Metric.Config.WithReporting(report =>
+      report.WithSignalFx("ORG_TOKEN", TimeSpan.FromSeconds(10)).WithBaseURI(ingestEndpoint).Build());
+```
 
 ### Default source name
 When reporting to SignalFx we need to associate the reported metrics to a "source". Some choices are:
@@ -61,29 +76,29 @@ If there are dimensions that you wish to send on all the metrics that you report
 ```csharp
 // Configure with NetBios Name as the default source
  Metric.Config.WithReporting(report => 
-      report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithNetBiosNameSource().Build());
+      report.WithSignalFx("ORG_TOKEN", TimeSpan.FromSeconds(5)).WithNetBiosNameSource().Build());
 ```
 ```csharp
 // Configure with DNS Name as the default source
 Metric.Config.WithReporting(report => 
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithDNSNameSource().Build());
+     report.WithSignalFx("ORG_TOKEN", TimeSpan.FromSeconds(5)).WithDNSNameSource().Build());
 ```
 ```csharp
 // Configure with FQDN as the default source
 Metric.Config.WithReporting(report => 
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithFQDNSource().Build());
+     report.WithSignalFx("ORG_TOKEN", TimeSpan.FromSeconds(5)).WithFQDNSource().Build());
 ```
 ```csharp
 // Configure with custom source name
 Metric.Config.WithReporting(report => 
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(5)).WithSource("<source name>").Build());
+     report.WithSignalFx("ORG_TOKEN", TimeSpan.FromSeconds(5)).WithSource("<source name>").Build());
 ```
 
 #### AWS Integration
 ```csharp
 // Add AWS Integration
 Metric.Config.WithReporting(report =>
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
+     report.WithSignalFx("ORG_TOKEN", TimeSpan.FromSeconds(10)).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
 ```
 
 #### Default Dimensions
@@ -93,7 +108,7 @@ IDictionary<string, string> defaultDims = new Dictionary<string, string>();
 defaultDims["environment"] = "prod";
 defaultDims["serverType"] = "API";
 Metric.Config.WithReporting(report =>
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithDefaultDimensions(defaultDims).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
+     report.WithSignalFx("ORG_TOKEN", TimeSpan.FromSeconds(10)).WithDefaultDimensions(defaultDims).WithAWSInstanceIdDimension().WithNetBiosNameSource().Build());
 ```
 
 #### Aggregations
@@ -113,7 +128,7 @@ The client can specify which of these aggregations they wish to send. By default
 ```csharp
 // Send the 99 percentile metrics
 Metric.Config.WithReporting(report =>
-     report.WithSignalFx("<your API token>", TimeSpan.FromSeconds(10)).WithMetricDetail(MetricDetails.percent_99).Build());
+     report.WithSignalFx("ORG_TOKEN", TimeSpan.FromSeconds(10)).WithMetricDetail(MetricDetails.percent_99).Build());
 ```
 
 ### App.Config Configuration
@@ -138,7 +153,7 @@ top of your App.Config file.
 
 Next you need to add a <signalFxReporter> stanza
 You must specify the following attributes:
- - apiToken - Your SignalFx token
+ - apiToken - Your SignalFx Organization Token
 
 The following attributes are optional
  - sourceDimension - What the name of the "source" dimension is. (If just a sourceType is specified and it is not 'none' then the default value for this is sf_source)
